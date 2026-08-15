@@ -1,0 +1,15 @@
+pandas
+python-dateutil
+tqdm
+soccerdata
+transfermarkt-wrapper
+requests
+python-dotenv
+statsmodels
+scipy
+patsy
+numpy
+matplotlib
+pillow
+pytest
+pytest-cov

@@ -1,0 +1,314 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+% The journal asks for Times New Roman or Arial at eleven point; newtx sets
+% text and mathematics in Times and supplies the AMS symbol coverage that
+% amssymb otherwise would.
+\usepackage{newtxtext,newtxmath}
+% The journal asks for a small, non-italicized p for p-values.
+\newcommand{\pval}{\mathrm{p}}
+\usepackage{array,booktabs}
+\usepackage{authblk}
+\usepackage{cite}
+\usepackage{graphicx}
+% Long identifiers -- repository URLs and DOIs -- have no natural break points
+% and otherwise run past the text block. Breaking at hyphens and slashes keeps
+% them inside the margin and intact.
+\PassOptionsToPackage{hyphens}{url}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{placeins}
+\usepackage{setspace}
+\usepackage[labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=false]{caption}
+\hypersetup{hidelinks}
+
+% Define \journalreviewcopy only for the line-numbered journal review PDF.
+\ifdefined\journalreviewcopy
+  \usepackage[right]{lineno}
+\fi
+
+% Naming the institution identifies the authors as surely as a name would, so
+% the anonymized copy redacts it and drops the institutional-guidance citation
+% with it; the name may appear in the body only through this macro.
+\ifdefined\journalblindcopy
+  \newcommand{\ethicsinstitution}{The authors' institution's}
+  \newcommand{\ethicscite}{}
+\else
+  \newcommand{\ethicsinstitution}{Trinity College Dublin}
+  \newcommand{\ethicscite}{~\cite{tcd2026_ethics_guidance}}
+\fi
+
+\bibliographystyle{vancouver}
+\doublespacing
+\setlength{\parindent}{0.5cm}
+\setlength{\parskip}{0pt}
+
+\newcommand{\papertitle}{Dividing by playing time removes part of the association it should scale: measuring the denominator gradient in eight European leagues}
+\title{\papertitle}
+
+\ifdefined\journalblindcopy
+  \author{}
+\else
+  \author[1,*]{Gustavo Pedro Ricou}
+  \author[2]{Nicholas Mahony}
+  \affil[1]{School of Computer Science and Statistics, Trinity College Dublin, Dublin 2, Ireland}
+  \affil[2]{Discipline of Anatomy, School of Medicine, Trinity College Dublin, Dublin 2, Ireland; njmahony@tcd.ie}
+  \affil[*]{Corresponding author: pedrorig@tcd.ie}
+\fi
+
+\date{}
+
+\begin{document}
+\ifdefined\journalreviewcopy
+  \linenumbers
+\fi
+\maketitle
+
+\begin{abstract}
+\textbf{Objectives:} To measure how much a per-minute denominator distorts an exposure association when playing time depends on it, to separate that from outcome truncation, and to provide a check that runs beforehand.
+
+\textbf{Design:} Retrospective public-data cohort with multi-league diagnostic replication.
+
+\textbf{Methods:} We analysed 88,573 appearances by 1,208 male English Premier League players with 900+ earlier club minutes, 2017--2025; the outcome was a public injury/absence spell start on an appearance date. The denominator gradient $\gamma$, the slope of log recorded minutes on the exposure, was fitted with player-clustered errors and replicated in 628,487 appearances across eight European leagues from appearance records alone.
+
+\textbf{Results:} Two defects contaminate recorded minutes, oppositely. The outcome truncated them --- among starters the median fell 90 to 53 --- but explained none of the attenuation ($-0.095\%$, resampled interval $-0.41\%$ to $0.20\%$). Exposure-dependent playing time explained it: $\gamma$ was 0.303 (0.283--0.323); changing only the offset moved the seven-day estimate from 1.27 (1.11--1.44) to 1.09 (0.95--1.25), an attenuation of 0.151 (0.140--0.163). It fell to 0.012 (0.009--0.015) within starters but persisted among substitutes (0.117) and where lineup status was missing (0.181); adjusting rather than restricting left 0.071 (0.062--0.080). Across eight leagues $\gamma$ ran 0.43 to 0.66 pooled and 0.020 to 0.031 within starters, without exception. Independent sources confirmed attribution in 24 of 27 resolved records (88.9\%, 71.9--96.1).
+
+\textbf{Conclusions:} Dividing by playing time is not a neutral rescaling: it removes part of the association it should scale. It is measurable from appearances alone and should be reported before any per-minute injury rate.
+\end{abstract}
+
+\noindent\textbf{Keywords:} Athletic Injuries; Soccer; Epidemiologic Methods; Bias (Epidemiology); Data Accuracy; Research Design
+
+\section{Introduction}
+
+Public injury records permit large retrospective studies of football, but are not prospective clinical surveillance. Transfermarkt, a commercial database maintained by volunteer contributors, publishes injury and absence \emph{spells} carrying a free-text label, a start date and an expected return date compiled from club statements and press reports, confirming neither diagnosis, mechanism, onset, recurrence nor time loss. Hoenig et al.\ analysed more than 20,000 such records and concluded that the numerator cannot carry epidemiological weight: a third could not be assigned an injury location and almost another third no type \cite{hoenig2022citizen_transfermarkt}. That verdict is about what is counted. A scoping search of the literature that followed it found seven peer-reviewed studies drawing football injury data from public sources: three media-based analyses \cite{szymski2023bundesliga_media,wilke2022_media_muscle,krutsch2021_bundesliga_restart}, an English case series \cite{palmer2023_english_case_series}, two ACL studies \cite{ortiz2026_acl_top_five,dambrosi2026_rtp_acl}, and the validity study above \cite{hoenig2022citizen_transfermarkt}. Five report a rate with a minute or hour denominator and are therefore exposed to what follows --- one of the five carries a provenance flag recorded in the deposited table --- and the remaining two could not be classified from the retrieved material. One of the ACL studies counts ruptures across the top five European leagues and divides them by hours of match exposure \cite{ortiz2026_acl_top_five}. The search strategy, its date and its limits are deposited beside the count. A scoping search establishes a floor, not a ceiling.
+
+Nothing is counted without also being divided. Shrier et al.\ showed analytically that when workload is time at risk, entering it as a Poisson offset is the same as entering log workload as a covariate with its coefficient fixed at one, and that \emph{when a risk factor of interest changes workload, including workload in the regression will cause bias} \cite{shrier2022_causal_workload}. This is overadjustment in the standard sense: control for a variable on the causal path from exposure to outcome \cite{schisterman2009_overadjustment}, and it is the same structure that makes time at work an unsafe covariate in occupational cohorts \cite{naimi2013_healthy_worker}. The same group later showed that a related misalignment --- measuring load over a window the outcome itself curtails --- produces spurious risk at low load, and named it an immortal-time bias \cite{wang2024_immortal_time_load}. That is the numerator's version of what we measure in the denominator, and we return to it below. Both arguments are directed acyclic graphs. They say the bias exists. They do not say how large it is, where it bites, whether anything else in the denominator competes with it, or how a reader would know before starting.
+
+We measure it. Two things can break the assumption that recorded minutes are neutral time at risk, and they are easy to conflate. A same-day event may stop its own \emph{exposure clock}, so a player leaving the field early contributes fewer minutes because of the event counted; this contaminates the denominator with the outcome. Separately, a player with more recent minutes is likelier to start, and a starter plays far longer than a substitute; this contaminates it with the exposure. We separate the two in one league, bound the remedy by squad role, and report the quantity that decides the question --- the \emph{denominator gradient} $\gamma$, the slope of log recorded minutes on the exposure --- as a check that needs appearance records and no injury data at all. We then measure that gradient in eight European domestic leagues. Recent club-match exposure is the exposure we divide; the association itself is a worked example, not a claim, and every analysis was selected after inspecting the data.
+
+\section{Methods}
+
+\subsection{Data, cohort and outcome}
+
+We used public Transfermarkt-derived appearance, match, player, club and injury-history records frozen on 4 August 2026 \cite{dcaribou_transfermarkt_datasets}; timestamps, hashes and schemas are in the manifest. The reference window was 1 July 2017 to 7 April 2025, covering men in English Premier League club-seasons; results do not extend to women's football. The pipeline reconciled 12,440 source reports into 11,993 non-overlapping episodes, ending an episode the day before any subsequent appearance --- reconciliation of inconsistent records, not a return-to-sport decision. Club exposure comprised senior domestic and European appearances, identifiers followed through transfers. Eligible rows required positive recorded minutes, complete model fields and 900+ earlier club-match minutes.
+
+The reference outcome was a public injury/absence spell \texttt{startDate} matching an appearance date. Transfermarkt does not document whether that field records onset, an asserted absence start or a backdated moderation decision, so we call it a \emph{same-day spell start}. One author checked an exposure-blinded sample of 30 against independent sources, and a second blinded queue of 30 report-free appearances was searched under the same rules and remains unadjudicated; both protocols, and the outcome-timing and ascertainment sensitivities, are in the Supplement.
+
+\subsection{The two defects and how they are separated}
+
+For a Poisson model, $\log E[y]=\log(m)+a+b_{\text{off}}x$ and $\log E[y]=a'+b_{\text{app}}x$ imply $b_{\text{off}}=b_{\text{app}}-\gamma$ to first order, where $\gamma$ is the slope of $\log(m)$ on the exposure. \emph{The comparison that identifies anything is fixed-90 against recorded minutes}: both are Poisson with a log link on the same rows, so only the offset differs.
+
+Outcome truncation is isolated by replacing each event row's minutes with the non-event mean for its lineup role and refitting; because the identity is an expansion we also measure the same quantity directly, fitting one Poisson model twice and changing nothing but the offset, and resample players 1,000 times for its interval. Exposure dependence is isolated by refitting all three denominators in every lineup stratum with 1,000 player-resampled percentile intervals, and by refitting adjusted for lineup role rather than stratified by it. We repeat the truncation comparison on appearances carrying an event under five imputations of the counterfactual minutes, and repeat the whole decomposition on a placebo exposure --- minutes played 31--37 days earlier --- which has no plausible causal path to a same-day report.
+
+\subsection{The denominator gradient as a pre-analysis check}
+
+$\gamma$ is a property of the denominator alone: it is fitted from appearances, dates and player identifiers, with no outcome. We therefore treat it as a check to be run before dividing, and report it with player-clustered 95\% intervals, pooled and within starters, in the reference league and in the seven other European domestic leagues with comparable coverage in the deposited snapshot. The cross-league fits use only what the check requires --- log minutes on previous-seven-day minutes with weekly and half-weekly calendar phase --- and we report the version without calendar terms alongside, because that is what two lines of code return. We call a gradient negligible below 0.05, a reporting threshold rather than a test, and read the decision from interval bounds.
+
+\subsection{Reporting and ethics}
+
+No dated plan or held-out sample existed, so nothing here is confirmatory; an estimate not clearing a multiplicity threshold is reported as attenuated, never absent. The worked example's defences --- covariates, clustering, club schedule, run-ins, season blocks, a negative-control exposure and outcome, ascertainment, and a bounded opportunity set with stabilised inverse-selection weights --- are all in the Supplement, as is the complete $7\times3\times3$ exposure family and its single Holm correction. Reporting follows STROBE \cite{vonelm2007strobe} and STROBE-SIIS \cite{bahr2020ioc}. The study reused public records with no recruitment, contact or clinical files. \ethicsinstitution{} guidance does not permit retrospective approval of secondary public data\ethicscite; no determination was obtained before the analysis began and none can now be issued, which we state rather than imply approval. The records concern identifiable professional athletes and the absence labels are health-related, so they are special-category personal data notwithstanding their public availability. Processing was for scientific research under the research provisions of the General Data Protection Regulation, restricted to data already published by the source, with no attempt to obtain, infer or link clinical information. No individual is identified in any reported result, table or figure, and no deposited file carries a name, a provider identifier or a match date. The hand-built audit records are keyed by surrogates drawn at random once and held apart from the archive, their dates coarsened to seasons; the reviewer's identified copy is retained by the authors and deposited nowhere, and row-level model diagnostics are not deposited at all. We do not claim anonymisation: the sampling rule is published, so a reader holding the provider's snapshot could redraw the same appearances, and no deposit can prevent that. What the archive does is refuse to supply the identification itself.
+
+\section{Results}
+
+\subsection{Cohort}
+
+Removing 12,469 rows below 900 earlier minutes left 88,573 appearances by 1,208 established players from 101,042, with 576 same-day spell starts (Fig.~\ref{fig:two_defects}A, Table~\ref{tab:cohort}). The 350 excluded players were younger and barely used: median age 22.6 against 26.7, 5 appearances against 56.5, 180 earlier minutes against 6,598.
+
+
+\begin{table}[htbp]
+\centering
+\caption{Characteristics of the 1,208 players and 88,573 eligible appearances. Continuous values are median (interquartile range); categorical values are number (percentage of the stated denominator). Eligibility required every reference-model field to be present, so no eligible row was lost to listwise deletion; lineup status is the one incomplete field and is reported against its own denominator. Prior report history counts earlier episodes per 10,000 earlier club minutes. Public report labels and reported absence are not clinical diagnoses or verified time loss.}
+\label{tab:cohort}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{llr}
+\toprule
+Characteristic & Denominator & Value\\
+\midrule
+Age at first eligible appearance, years & --- & 25.1 (22.5--28.0)\\
+Club appearances per player & --- & 48.0 (20.0--106.2)\\
+Club-match minutes per player & --- & 3,106.5 (1,167.5--7,207.2)\\
+Prior report history, per 10,000 minutes & --- & 5.1 (2.4--9.2)\\
+Previous-7-day club minutes per appearance & --- & 75.0 (0.0--90.0)\\
+Current recorded minutes per appearance & --- & 90.0 (60.0--90.0)\\
+\quad Mean on spell-start appearances & 576 appearances & 50.1\\
+\quad Mean on all other appearances & 87,997 appearances & 71.1\\
+Recorded starters & 67,320 known-lineup appearances & 53,990 (80.2\%)\\
+Recorded substitutes & 67,320 known-lineup appearances & 13,330 (19.8\%)\\
+Lineup status unavailable & 88,573 appearances & 21,253 (24.0\%)\\
+Same-day spell starts & 88,573 appearances & 576 (0.65\%)\\
+\quad Reported absence $\geq$ 28 days & 88,573 appearances & 337 (0.38\%)\\
+\quad Muscle/tendon text & 88,573 appearances & 266 (0.30\%)\\
+Players with $\geq1$ same-day spell start & 1,208 players & 364 (30.1\%)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth]{figures/J1_jsams_cohort_measurement.png}
+\caption{The two defects in the recorded-minute denominator. Panel A separates the 12,469 run-in exclusions from the retained cohort. Panel B gives the distribution of recorded minutes (p10, p25, median, p75, p90) by lineup role and event status: among starters the distribution shifts markedly when a same-day report is present, while among substitutes it does not, which is the signature of early withdrawal rather than a uniform shift. Starters without a report have an interquartile range of 89--90 minutes, so their box collapses to a line at this scale and the row reads as a whisker. Panel C refits the denominator comparison within squad role; fixed-90 and recorded-minute models are both Poisson with a log link on identical rows, so only the offset differs between them. The pooled gap between those two models nearly closes within starters, identifying exposure-dependent playing time rather than outcome truncation as its cause. These are associations between reported spell starts and recorded appearance length; they do not identify event time.}
+\label{fig:two_defects}
+\end{figure}
+
+\FloatBarrier
+
+\subsection{The outcome truncates recorded minutes}
+
+Truncation is visible as a shifted distribution, not merely a shifted mean (Fig.~\ref{fig:two_defects}B). Among starters the median recorded appearance fell from 90 minutes without a report to 53 with one; among substitutes the two were indistinguishable, 18.0 against 18.5, which is the signature of early withdrawal rather than a uniform shift. Across all appearances the mean difference was $-21.0$ minutes (95\% CI $-23.1$ to $-19.0$), driven by starters; substitutes show no shift.
+
+\subsection{But truncation explains none of the attenuation}
+
+Changing only the offset, holding family, link and rows fixed, the seven-day estimate fell from 1.27 (1.11--1.44) under fixed 90 minutes to 1.09 (0.95--1.25) under recorded minutes, an attenuation of 0.151 (0.140--0.163) on the log scale. The obvious explanation is wrong. Same-day reports occur on 0.65\% of appearances and the minutes missing from them are 0.24\% of all recorded minutes, inflating any per-minute rate by 1.002. Two estimators agree: $\gamma$ was 0.303 and became 0.304 with truncation removed, while swapping recorded for untruncated minutes in the offset moved the coefficient by $-0.095\%$ of the attenuation, a resampled interval of $-0.41\%$ to $0.20\%$ that includes zero.
+
+Truncation is vivid but almost inconsequential over the cohort, and worth locating. The dilution disappears once analysis is restricted to appearances carrying an event: mean recorded minutes there were 50.1, against 76.5 untruncated. Any quantity conditioned on cases --- exposure on the injury day, or a burden denominated on injured players' own time --- is understated by 34.6\% against 0.24\% for the cohort, a factor of 143. That figure is most exposed to the imputation, ranging from 34.5\% to 42.6\% across five schemes, a deterministic range at whose least-alarming end the reference scheme sits.
+
+\subsection{Exposure-dependent playing time explains it, and squad role bounds the remedy}
+
+What explains it is that recorded minutes are a function of the exposure. The cleanest evidence needs no events: $\gamma$ was 0.011 (0.007--0.014) within starters, 0.214 (0.182--0.247) within substitutes and 0.351 (0.317--0.386) where lineup status was missing, against 0.303 (0.283--0.323) pooled, the starter interval disjoint from all three. It tracks how much room the offset has to move --- recorded minutes have an interquartile range of 2 minutes among starters against 18, 45 and 30 --- and the attenuation follows it (Table~\ref{tab:strata}).
+
+The refit agrees without assuming $\gamma$ (Fig.~\ref{fig:two_defects}C). Within starters the attenuation was 0.012 against 0.151 pooled, a difference of 0.139 (0.128--0.150) over 1,000 player resamples. Stratifying is not a general remedy, and adjusting is no substitute: a role term leaves 0.071 (0.062--0.080), six times what starters retain, with no interval overlap. Stratifying works well among starters and nowhere else: substitutes retain 0.117 (0.078--0.152) and the quarter without lineup status retain 0.181 (0.159--0.202), more than pooling costs, their recorded-minute estimate falling to 1.00 (0.79--1.28). That last stratum carries the steepest gradient of all, and the reason confirms rather than complicates the mechanism: its recorded minutes run from a tenth percentile of 14 to a median of 90, so it is not a squad role at all but an unseparated mixture of starters and substitutes. Where role cannot be held fixed, composition is left free to vary, and the gradient is largest exactly there. Substitutes carry truncation absent and attenuation present inside one stratum, the cleanest separation of the two defects; with 26 events it is the least precise, so $\gamma$ carries it, not the association.
+
+The first-order identity is imperfect. It over-predicts the attenuation twofold and increasingly so as $\gamma$ grows, because the expansion weights appearances equally whereas the Poisson score weights by fitted means. That over-prediction is a property of the arithmetic rather than of this exposure: the placebo window, chosen for having no plausible causal path, carries its own gradient of 0.201 (0.187--0.216) and its own attenuation of 0.101, a ratio of 1.99 against 2.01 for the reference exposure. We therefore rely on the direct refit.
+
+
+\begin{table}[htbp]
+\centering
+\caption{Design and denominator behaviour in every stratum over which the remedy is claimed. $\gamma$ is the denominator gradient, the slope of log recorded minutes on exposure, fitted with player-clustered errors pooled and within strata alike; it is a property of the denominator alone, estimated from rows rather than events, which is why it remains informative among substitutes where only 26 events make the association itself uninformative. The attenuation is the gap between fixed-90 and recorded-minute Poisson coefficients on identical rows, with percentile intervals from resampling players 1,000 times. Figure~\ref{fig:two_defects}C gives the two estimates behind each attenuation with their own intervals. The attenuation tracks $\gamma$, and $\gamma$ tracks how much room the offset has to vary. The final row adjusts for squad role instead of stratifying by it, on all 88,573 appearances; a categorical term changes the linear predictor while the offset keeps its within-role variation, so 0.071 survives, roughly half the pooled attenuation and six times what restricting to starters leaves. That row describes a model rather than a population, so its $\gamma$ and interquartile range are left blank. Player counts sum to more than the 1,208 in the cohort because a player who both starts and appears as a substitute contributes to each stratum he appears in. Estimates are per 90 previous-seven-day club minutes.}
+\label{tab:strata}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrrll}
+\toprule
+ & & & & IQR & & \\
+Stratum & Appearances & Players & Events & minutes & $\gamma$ (95\% CI) & Attenuation (95\% CI)\\
+\midrule
+All appearances & 88,573 & 1,208 & 576 & 30 & 0.303 (0.283--0.323) & 0.151 (0.140--0.163)\\
+Starters & 53,990 & 1,062 & 364 & 2 & 0.011 (0.007--0.014) & 0.012 (0.009--0.015)\\
+Substitutes & 13,330 & 959 & 26 & 18 & 0.214 (0.182--0.247) & 0.117 (0.078--0.152)\\
+Lineup unknown & 21,253 & 626 & 186 & 45 & 0.351 (0.317--0.386) & 0.181 (0.159--0.202)\\
+\midrule
+\multicolumn{7}{l}{\emph{Adjusted for squad role rather than stratified, on all appearances}}\\
+Role-adjusted & 88,573 & 1,208 & 576 & --- & --- & 0.071 (0.062--0.080)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The gradient is not a fact about one league}
+
+Across 628,487 appearances in eight European domestic leagues, using appearance records alone, the pooled gradient ran from 0.431 in Spain to 0.655 in Portugal, median 0.536, exceeding the negligible threshold in every league without exception (Fig.~\ref{fig:gradient}, Table~\ref{tab:leagues}). Within starters it ran from 0.020 to 0.031 and fell below that threshold in every league, again without exception. Dropping the calendar terms --- the two-line version --- moved no league's gradient by more than 0.056. Raising the one-minute floor beneath the log to ten moved the pooled gradient by 0.095 and the within-starter gradient not at all, and the pooled-versus-starter contrast held under a median regression, a fractional-response fit and every floor tried. The decision rule therefore returns the same verdict everywhere: restrict to starters, or report per appearance.
+
+It is the one result no outcome can contaminate: fitted from player identifiers, dates and recorded minutes, with no injury record, diagnosis or absence label entering it. Whatever is true of the sensitivity of a public spell-start date --- and we report below that it is unknown --- none of it reaches these eight numbers.
+
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth]{figures/J2_jsams_denominator_gradient.png}
+\caption{The denominator gradient across eight European domestic leagues, fitted from appearance records alone. Panel A gives $\gamma$ with player-clustered 95\% intervals, pooled over all appearances and within starters, against the negligible threshold of 0.05. The pooled gradient exceeds that threshold in every league and the within-starter gradient falls below it in every league, without exception. Panel B gives the interquartile range of recorded minutes in the same two populations and supplies the reason: an offset can only carry a gradient to the extent that it varies, and starters have almost no minutes to vary over. Both panels use domestic-league appearances only, with no eligibility restriction and no injury data.}
+\label{fig:gradient}
+\end{figure}
+
+\FloatBarrier
+
+
+\begin{table}[htbp]
+\centering
+\caption{The denominator gradient in eight European domestic leagues, 1 July 2017 to 7 April 2025. Every value is fitted from appearance records alone --- player identifier, date and recorded minutes --- with no injury data of any kind, which is what makes the gradient usable as a pre-analysis check. Intervals are player-clustered. The unadjusted column drops the weekly and half-weekly calendar terms and is what two lines of code return; it differs from the adjusted fit by at most 0.056. The recommendation reads interval bounds against a negligible threshold of 0.05: a pooled lower bound above it means the minute denominator is not a neutral rescaling, and a within-starter upper bound below it means restricting to starters restores neutrality. These gradients use all domestic-league appearances without the eligibility restriction or history term applied to the reference cohort, and so exceed the 0.303 reported there: England reads 0.472 here against 0.303 in the cohort, and the two are the same quantity measured over different populations rather than a disagreement. Three differences account for it --- every appearance rather than established players only, domestic-league exposure rather than all competitions, and no prior-history term to absorb between-player variation in playing time --- and all three make the diagnostic the higher reading. The diagnostic is also the one a reader would compute. The three specifications used in this paper are registered in the deposited specification table; the comparison is of mechanism, not magnitude.}
+\label{tab:leagues}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrlrl}
+\toprule
+ & & & \multicolumn{3}{c}{Denominator gradient $\gamma$}\\
+\cmidrule(l){4-6}
+League & Appearances & Players & Pooled (95\% CI) & Unadj. & Within starters (95\% CI)\\
+\midrule
+England, Premier League & 84,317 & 1,580 & 0.472 (0.447--0.496) & 0.453 & 0.020 (0.017--0.023)\\
+Spain, LaLiga & 87,708 & 1,730 & 0.431 (0.409--0.452) & 0.412 & 0.026 (0.023--0.030)\\
+Italy, Serie A & 88,655 & 1,769 & 0.474 (0.452--0.496) & 0.449 & 0.030 (0.026--0.034)\\
+Germany, Bundesliga & 71,036 & 1,481 & 0.581 (0.553--0.610) & 0.525 & 0.029 (0.025--0.033)\\
+France, Ligue 1 & 80,094 & 1,881 & 0.490 (0.467--0.514) & 0.485 & 0.025 (0.021--0.029)\\
+Netherlands, Eredivisie & 67,084 & 1,762 & 0.601 (0.574--0.629) & 0.569 & 0.024 (0.020--0.027)\\
+Portugal, Liga Portugal & 71,043 & 2,002 & 0.655 (0.627--0.683) & 0.623 & 0.031 (0.027--0.035)\\
+Turkey, Süper Lig & 78,550 & 2,044 & 0.620 (0.593--0.647) & 0.588 & 0.026 (0.022--0.030)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{What the outcome itself will and will not support}
+
+An independent source confirmed exact-match attribution for 24 of 27 resolved records (88.9\%, 95\% CI 71.9--96.1) and 24 of 30 sampled (80.0\%, 62.7--90.5), bounding the sampled proportion between 80.0\% and 90.0\%. Both describe agreement among sampled \emph{positives}; the report-free queue is unadjudicated, so sensitivity is unknown. Outcome timing left the denominator pattern intact: lag-1 and combined per-appearance ratios were 1.23 and 1.24 against recorded-minute 1.05 and 1.06. The 30 report-free appearances were searched under a deposited pre-specified protocol and all 30 remain unadjudicated. The protocol excludes injury aggregators, which may derive from the database under audit; requires a source tied to the appearance date naming a physical problem rather than rotation; and maps failure to find a source to unresolved, never to no missed event, because minor injuries routinely go unreported and recording non-detection as a negative would bias sensitivity upwards. Screening them first against club fixture lists explains why so few were searchable: in 28 of 30 the player's club played no fixture between the appearance and the player's next, so no absence existed for a report to have missed. Of the two remaining, one gap spans a transfer, and for the other the only public source is dated nine days later and describes assessment rather than injury, which rule B2 excludes. That asymmetry means the queue can yield a lower bound on missed events and never an upper bound on them. The pre-specified illness negative-control outcome could not be estimated: one same-day illness report arose across 88,573 appearances, so it is uninformative rather than failed, and the outcome does not capture illness.
+
+\subsection{The exposure association, as a worked example}
+
+Each additional 90 club minutes in the previous seven days carried 1.27 times the odds of a same-day spell start (95\% CI 1.11--1.44; Holm-adjusted $\pval=0.016$), 3.3 more per 1,000 appearances (1.3--5.4) from zero to 180 recent minutes. Across the declared 63-model family the median odds ratio was 1.16 (1.06--1.23), and the five cumulative windows, correlated at $r$=0.36 to 0.85, are one signal at several widths. It survived every measured alternative in the Supplement but did not survive squad role intact: adjusting on the same rows moved it to 1.19 (1.04--1.36), and within starters alone it was 1.18 (0.998--1.398, $\pval=0.052$). We report it to have something to divide, not as a finding.
+
+\section{Discussion}
+
+Two denominator defects live in these data, they are easy to conflate, and they behave in opposite ways. Outcome truncation --- the \emph{exposure clock} stopping when a player leaves the field --- looks alarming and matters least, dramatic per event yet diluted to nothing across every appearance. Exposure-dependent playing time is the reverse, invisible per row and decisive for the estimate. We expected the first to explain the second; two estimators, one making no approximation, agree it does not.
+
+That asymmetry generalises past this dataset. A rare-event distortion is bounded by how rare the events are: truncation costs a cohort rate 0.24\% and a case-restricted quantity 34.6\%. A distortion tracking the exposure has no such bound, acting on every row in the direction of the gradient being estimated, which is why dividing by playing time is closer to overadjustment for a variable on the exposure's pathway \cite{schisterman2009_overadjustment} than to neutral rescaling. The lineage is older still: ratio standards whose denominator tracks the quantity under study have misled regression since Kronmal's warning \cite{kronmal1993_ratio_standard}, and sport science raised the same alarm for per-body-mass scaling three decades ago \cite{nevill1995_allometric}; what those critiques lack is this denominator's mechanism and its measured size. Road safety knows the identical structure as low-mileage bias --- per-kilometre crash rates indict older drivers only until drivers are compared within matched annual distance \cite{hakamies2002_low_mileage,langford2006_low_mileage}, the within-starters restriction with the gradient's sign reversed --- and economics names its measurement-error cousin division bias \cite{borjas1980_division_bias}. Sport has met the mechanism itself once before: an NBA analysis found heavy recent minutes spuriously protective, the same endogeneity read through a healthy-worker lens, and repaired the hazard after the fact with inverse-probability weighting \cite{yu2026_load_management}. The gradient replaces repair with a measurement that runs before any model is fitted.
+
+Shrier et al.\ predicted this analytically \cite{shrier2022_causal_workload}; what was missing was its size, its boundary and a way to detect it. Here it is 0.151 on the log scale, enough to turn 1.27 into 1.09 and nullify a conclusion while leaving no trace in the output. Its boundary is squad role, but only as a proxy for what matters --- how much room the offset has to move. Starters have an interquartile range of two minutes, and the fix works there for that reason, not because a role was held fixed. Among substitutes 0.117 survives, among the quarter with no lineup status 0.181 does, and adjusting rather than stratifying leaves 0.071. Per-minute analysis is therefore defensible \emph{within starters}, not within squad role generally; where appearance length varies, per-appearance probability is safer.
+
+The detection is the gradient itself, and it costs a reader one regression on data they already have. That it exceeds the negligible threshold in all eight leagues we could measure, and falls below it within starters in all eight, says the mechanism is a property of how squads are rotated rather than of English football or of Transfermarkt. The magnitude is local and should be measured locally; the mechanism is not. Restricting to starters is an old informal practice, and starting status stratifies incidence itself in women's football \cite{morenoperez2025_starting_status}; the gradient is the measurement that says when the restriction is necessary and when it suffices. The diagnostic complements the statistical programme on modelling load itself \cite{bachemathiesen2024_acute_chronic}, and it slots directly in front of the standard toolchain, which fits per-exposure rates through a log-exposure offset with no check of how that exposure tracks the covariates \cite{zumeta_injurytools_cran}: that work asks how exposure should enter a model; this asks what dividing by its recorded time silently does.
+
+Two boundaries on our own claims. The exposure association is a worked example rather than a finding: every specification was chosen after inspecting the data, the cumulative windows correlate up to $r$=0.85 and reuse the same matches, and adjusting for squad role moved it from 1.27 to 1.19, so part of what such a gradient measures is who gets selected rather than what playing does. And our audit sits below prospective multi-source media surveillance \cite{szymski2023bundesliga_media} and severe-injury protocols \cite{krutsch2020media_validity}: retrospective, single-assessor and restricted to reported positives, it checks date attribution, not case ascertainment. Hoenig et al.'s warning stands and this study sharpens it \cite{hoenig2022citizen_transfermarkt}: the problem is not only incomplete reports but an exposure record shaped by both the outcome and the exposure.
+
+\subsection{Limitations}
+
+The truncation result is descriptive and its mechanism inferred: we never observe the minute an event occurred, so cannot show the report ended the appearance rather than that early withdrawal attracts coverage. No imputation scheme addresses event appearances differing for reasons unrelated to the event. Both defects follow from this dataset's recording conventions; their magnitude elsewhere must be measured. The cross-league gradients are computed on domestic-league appearances only, without the eligibility restriction or history term used in the reference cohort, which is why they exceed it; the comparison is of mechanism, not magnitude. Transfermarkt records do not meet surveillance consensus standards \cite{bahr2020ioc,walden2023_football_consensus}; same-day records may reflect delayed coding, training events or unrelated absence.
+
+All analyses were developed after inspection, so Holm correction controls only the stated 63-model family and intervals cover sampling uncertainty, not unmeasured misclassification or selection. The audit used one author and 30 sampled positives, its kappa unestimated. The missed-event queue was searched and returned no verdict on any record: the searches that could be run failed on identification, one on a club headline ambiguous between two fixtures against the same opponent with the same scoreline, which is precisely what rule B4 exists to catch. Zero confirmed missed events is therefore not an estimate of zero. Outcome sensitivity remains unestimated, and we report it as unknown rather than as reassuring. The placebo window was associated with the outcome when fitted alone, 1.15 (1.01--1.30), so reporting propensity is present; adjusting the two windows mutually left the recent window at 1.25 (1.09--1.42) and the placebo at 1.12 (0.98--1.27), so the recent window survives conditioning on the placebo and the placebo does not survive the reverse, but the two are only partly separable. Club schedule and individual minutes remain entangled, and the run-in exclusions above leave nothing to say about first-season players; run-in thresholds of 450 and 1,800 minutes gave similar estimates.
+
+\section{Conclusion}
+
+Recorded minutes are contaminated twice, and the defects behave in opposite ways. Outcome truncation is dramatic per event and negligible in aggregate --- 0.24\% of cohort exposure but 34.6\% on appearances carrying an event --- so it matters only where an analysis conditions on cases. Exposure-dependent playing time is invisible per row and decisive in aggregate, attenuating a seven-day association from 1.27 to 1.09. The quantity that decides which applies is the denominator gradient, it needs no injury data, and it exceeded the negligible threshold in all eight leagues we could measure.
+
+\section*{Practical implications}
+\nopagebreak
+\begin{itemize}
+\item Injury rates are often reported per minute of play. Before dividing by minutes, check whether minutes played rise and fall with the workload being studied: in every league we measured they do, and the division then removes part of the very association it is meant to scale. The paper provides a two-line check that needs only appearance records, with no injury data at all.
+\item Where the check shows minutes track the workload, either study regular starters only --- their minutes barely vary, so dividing by them changes little --- or report the risk per appearance instead of per minute.
+\item Studying starters works because they nearly all play the full match, not because of the role itself: neither grouping players by role nor allowing for role in a model makes the minute denominator safe, and giving every appearance a fixed 90 minutes only relabels the per-appearance answer.
+\item An injured player usually leaves the field early, so injured appearances look shorter than they truly were. Across a whole season this barely moves an overall rate, but any figure based only on injured players' own recorded minutes --- playing time on the day of injury, or a burden divided by it --- can be understated by roughly a third.
+\item A public injury date is a report, not a diagnosis. These results should not be used to clear a player to play or to set a workload ceiling.
+\end{itemize}
+
+\section*{Funding}
+No specific funding or external financial support was received.
+
+\section*{Competing interests}
+The authors declare no competing interests.
+
+\ifdefined\journalblindcopy
+\section*{Author contributions}
+Author names and role assignments are supplied in the separate title-page file.
+
+\section*{Acknowledgements}
+Acknowledgements are supplied in the separate title-page file for anonymised review.
+
+\section*{Data availability and reproducibility}
+Permanent code and derived-output records exist; identifying DOI details are supplied in the separate title-page file. The pipeline writes all model, audit, support, hypothesis-register and figure outputs from versioned inputs.
+\else
+\section*{Author contributions}
+Gustavo Pedro Ricou: conceptualisation, data curation, formal analysis, methodology, software, visualisation, writing--original draft, and writing--review and editing. Nicholas Mahony: clinical interpretation, methodology, and writing--review and editing.
+
+\section*{Acknowledgements}
+The authors thank James Ng, School of Computer Science and Statistics, Trinity College Dublin, for statistical feedback on observational framing, selection bias and internal stability checks. The authors thank Adam Field, Manchester Metropolitan University, for comments on fixture-congestion framing, practitioner readability and cautious interpretation. The authors thank Rilind Ob\"ertinca, University of Innsbruck, for comments on sports-medicine terminology, presentation and interpretation.
+
+\section*{Data availability and reproducibility}
+This paper, the analysis pipeline that produced every number reported here, its test suite and the hand-built audit evidence no script can regenerate are archived together as a single record at DOI 10.5281/zenodo.21940597, so the version of record of the evidence includes the version of the text it supports; the development repository is \url{https://github.com/Gustolandia/football-denominator-gradient}, and the archives of earlier versions of this work are at DOIs 10.5281/zenodo.21673177 and 10.5281/zenodo.21673210 \cite{ricou_epl_congestion_code_2026,ricou_epl_congestion_dataset_2026}. The pipeline writes all model, audit, support, hypothesis-register and figure outputs from versioned inputs. Source records were public; redistribution must follow applicable source and Transfermarkt terms.
+\fi
+
+\noindent\textbf{Declaration of generative AI and AI-assisted technologies in manuscript preparation.}
+During preparation of this work, the authors used OpenAI Codex to assist software development, code review, documentation and language editing. The authors inspected and tested the code, verified the reported outputs, reviewed and edited the text, and take full responsibility for the content.
+
+\begingroup
+\footnotesize
+\bibliography{references}
+\endgroup
+
+\end{document}

@@ -1,0 +1,17 @@
+[run]
+branch = True
+source =
+    .
+omit =
+    tests/*
+    tools/*
+    .codex_deps/*
+    .venv*/*
+
+[report]
+fail_under = 100
+show_missing = True
+skip_covered = False
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:

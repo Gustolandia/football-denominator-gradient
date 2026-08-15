@@ -1,0 +1,80 @@
+# --- Python bytecode / cache ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*$py.class
+
+# --- Logs and temp files ---
+*.log
+*.tmp
+*.temp
+tmp/
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+
+# --- Environment / secrets ---
+.env
+.env.*
+*.envrc
+
+# Virtual environments
+.venv/
+.venv*/
+venv/
+venv*/
+.venv312/
+.codex_deps/
+.tools/
+.codex_tools/
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.claude/
+*.code-workspace
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# --- Project-specific data (large / derived) ---
+# The data tree is local and reproducible from the documented provider inputs,
+# with one exception: data/manual/ holds hand-adjudicated evidence that no
+# script can regenerate, so it is versioned deliberately.
+# Everything under data/manual/ is versioned, not an enumerated list of it:
+# an allow-list silently drops the next hand-built file someone adds, which is
+# exactly the file that cannot be recovered by rerunning anything.
+data/*
+!data/manual/
+# The reviewer's own identified audit record and the surrogate map. Tracked
+# here so the evidence survives a lost machine; carried by no deposit
+# builder, both of which read data/manual and data/processed only.
+!data/private/
+external_data
+public_deposit/
+
+# --- Local config variants (if you ever create them) ---
+config.local.py
+config.dev.py
+
+
+# --- Manuscript source, clean PDF, and vetted figures are versioned ---
+manuscript/*.aux
+manuscript/*.bbl
+manuscript/*.blg
+manuscript/*.fdb_latexmk
+manuscript/*.fls
+manuscript/*.log
+manuscript/*.out
+manuscript/*.pdf
+!manuscript/manuscript.pdf
+manuscript/*.synctex.gz
+manuscript/figures/
+!manuscript/figures/
+!manuscript/figures/*.png
+!manuscript/.gitkeep
+output/

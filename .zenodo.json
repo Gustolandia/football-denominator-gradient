@@ -1,0 +1,34 @@
+{
+  "title": "Dividing by playing time removes part of the association it should scale: measuring the denominator gradient in eight European leagues",
+  "upload_type": "publication",
+  "publication_type": "preprint",
+  "description": "Replication record for a study of the denominator gradient: the slope of log recorded match minutes on recent match exposure, which measures how much of an exposure association a per-minute denominator divides out. The record contains the manuscript and supplement, the full analysis pipeline, its test suite at complete statement and branch coverage, the hand-built audit evidence no script can regenerate, and the documentation needed to rerun every reported number from the committed inputs. LICENCE CARVE-OUT: the data compilation and documentation are released under CC BY 4.0; the code is released under the MIT Licence; the manuscript and supplement files are (c) the authors and are expressly NOT released under CC BY, pending journal publication.",
+  "creators": [
+    {
+      "name": "Ricou, Gustavo Pedro",
+      "affiliation": "School of Computer Science and Statistics, Trinity College Dublin",
+      "orcid": "0009-0001-4196-7213"
+    },
+    {
+      "name": "Mahony, Nicholas",
+      "affiliation": "Discipline of Anatomy, School of Medicine, Trinity College Dublin"
+    }
+  ],
+  "license": "CC-BY-4.0",
+  "keywords": [
+    "association football",
+    "injury epidemiology",
+    "exposure denominator",
+    "measurement bias",
+    "Poisson offset",
+    "reproducible research"
+  ],
+  "related_identifiers": [
+    {
+      "scheme": "arxiv",
+      "identifier": "arXiv:2608.11228",
+      "relation": "isIdenticalTo",
+      "resource_type": "publication-preprint"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite the version-specific Zenodo record.
+title: >-
+  Dividing by playing time removes part of the association it should scale:
+  measuring the denominator gradient in eight European leagues
+type: software
+authors:
+  - family-names: Ricou
+    given-names: Gustavo Pedro
+    affiliation: School of Computer Science and Statistics, Trinity College Dublin
+    orcid: https://orcid.org/0009-0001-4196-7213
+  - family-names: Mahony
+    given-names: Nicholas
+    affiliation: >-
+      Discipline of Anatomy, School of Medicine, Trinity College Dublin
+repository-code: https://github.com/Gustolandia/football-denominator-gradient
+url: https://github.com/Gustolandia/football-denominator-gradient
+license: MIT
+preferred-citation:
+  type: article
+  title: >-
+    Dividing by playing time removes part of the association it should scale:
+    measuring the denominator gradient in eight European leagues
+  authors:
+    - family-names: Ricou
+      given-names: Gustavo Pedro
+    - family-names: Mahony
+      given-names: Nicholas
+  year: 2026
+  identifiers:
+    - type: other
+      value: arXiv:2608.11228
+      description: Preprint
+keywords:
+  - association football
+  - injury epidemiology
+  - exposure denominator
+  - measurement bias
+  - Poisson offset
+  - reproducible research
