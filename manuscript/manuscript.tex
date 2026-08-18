@@ -66,15 +66,15 @@
 \maketitle
 
 \begin{abstract}
-\textbf{Objectives:} To measure how much a per-minute denominator distorts an exposure association when playing time depends on it, to separate that from outcome truncation, and to provide a check that runs beforehand.
+\textbf{Objectives:} To measure how much a per-minute denominator distorts an exposure association when playing time depends on it, to separate that from outcome truncation, and to provide a check that runs first.
 
 \textbf{Design:} Retrospective public-data cohort with multi-league diagnostic replication.
 
-\textbf{Methods:} We analysed 88,573 appearances by 1,208 male English Premier League players with 900+ earlier club minutes, 2017--2025; the outcome was a public injury/absence spell start on an appearance date. The denominator gradient $\gamma$, the slope of log recorded minutes on the exposure, was fitted with player-clustered errors and replicated in 628,487 appearances across eight European leagues from appearance records alone.
+\textbf{Method:} We analysed 88,573 appearances by 1,208 male English Premier League players with 900+ earlier club minutes, 2017--2025; the outcome was a public injury/absence spell start on an appearance date. The denominator gradient $\gamma$, the slope of log recorded minutes on the exposure, was fitted with player-clustered errors and replicated in 628,487 appearances across eight European leagues from appearance records alone.
 
 \textbf{Results:} Two defects contaminate recorded minutes, oppositely. The outcome truncated them --- among starters the median fell 90 to 53 --- but explained none of the attenuation ($-0.095\%$, resampled interval $-0.41\%$ to $0.20\%$). Exposure-dependent playing time explained it: $\gamma$ was 0.303 (0.283--0.323); changing only the offset moved the seven-day estimate from 1.27 (1.11--1.44) to 1.09 (0.95--1.25), an attenuation of 0.151 (0.140--0.163). It fell to 0.012 (0.009--0.015) within starters but persisted among substitutes (0.117) and where lineup status was missing (0.181); adjusting rather than restricting left 0.071 (0.062--0.080). Across eight leagues $\gamma$ ran 0.43 to 0.66 pooled and 0.020 to 0.031 within starters, without exception. Independent sources confirmed attribution in 24 of 27 resolved records (88.9\%, 71.9--96.1).
 
-\textbf{Conclusions:} Dividing by playing time is not a neutral rescaling: it removes part of the association it should scale. It is measurable from appearances alone and should be reported before any per-minute injury rate.
+\textbf{Conclusions:} Dividing by playing time is not a neutral rescaling: it removes part of the association it should scale. It is measurable from appearances alone and should be reported before any per-minute rate.
 \end{abstract}
 
 \noindent\textbf{Keywords:} Athletic Injuries; Soccer; Epidemiologic Methods; Bias (Epidemiology); Data Accuracy; Research Design
@@ -303,7 +303,7 @@ The authors thank James Ng, School of Computer Science and Statistics, Trinity C
 This paper, the analysis pipeline that produced every number reported here, its test suite and the hand-built audit evidence no script can regenerate are archived together as a single record at DOI 10.5281/zenodo.21940597, so the version of record of the evidence includes the version of the text it supports; the development repository is \url{https://github.com/Gustolandia/football-denominator-gradient}, and the archives of earlier versions of this work are at DOIs 10.5281/zenodo.21673177 and 10.5281/zenodo.21673210 \cite{ricou_epl_congestion_code_2026,ricou_epl_congestion_dataset_2026}. The pipeline writes all model, audit, support, hypothesis-register and figure outputs from versioned inputs. Source records were public; redistribution must follow applicable source and Transfermarkt terms.
 \fi
 
-\noindent\textbf{Declaration of generative AI and AI-assisted technologies in manuscript preparation.}
+\noindent\textbf{Declaration of Generative AI and AI-assisted technologies in the writing process.}
 During preparation of this work, the authors used OpenAI Codex to assist software development, code review, documentation and language editing. The authors inspected and tested the code, verified the reported outputs, reviewed and edited the text, and take full responsibility for the content.
 
 \begingroup
