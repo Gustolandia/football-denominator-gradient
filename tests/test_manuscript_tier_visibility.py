@@ -719,6 +719,7 @@ TITLE_BEARING = (
     Path("manuscript") / "credit_author_statement.tex",
     Path("manuscript") / "declaration_of_interest.tex",
     Path("manuscript") / "acknowledgement_funding_ethics.tex",
+    Path("manuscript") / "strobe_checklist.tex",
     Path("tools") / "build_public_release.py",
 )
 
@@ -759,8 +760,8 @@ def test_the_title_page_carries_a_valid_orcid():
 
 
 def test_no_document_still_carries_a_superseded_title():
-    """A title lives in nine files, and a rename reaches eight of them. The
-    ninth goes to an editor saying the paper is about something else."""
+    """A title lives in ten files, and a rename reaches nine of them. The
+    tenth goes to an editor saying the paper is about something else."""
     tex = MANUSCRIPT.read_text(encoding="utf-8")
     title = _normalise(
         re.search(r"\\newcommand\{\\papertitle\}\{([^}]*)\}", tex).group(1)
@@ -852,6 +853,7 @@ def test_causal_language_is_absent_from_the_abstract():
 US_SPELLINGS = (
     "analyze", "analyzed", "modeled", "modeling", "labeled",
     "generalize", "generalized", "minimize", "behavior", "favor",
+    "artifact", "italicized",
 )
 
 
@@ -862,6 +864,9 @@ def test_uk_spelling_is_consistent():
         text = path.read_text(encoding="utf-8").lower()
         for variant in US_SPELLINGS:
             assert variant not in text, (path.name, variant)
+        # Rates are written "per 1000 hours", without the thousands comma the
+        # counts use; the supplement once mixed both forms in one section.
+        assert "per 1,000" not in text, path.name
 
 
 def test_the_governing_analogy_appears_exactly_twice():
@@ -1060,6 +1065,26 @@ def test_preprint_is_declared_where_the_journal_requires_it():
     assert "odds ratio" not in letter
     assert "roughly a third" not in letter
     assert "rate ratio" in letter
+
+
+#: Published Science and Medicine in Football articles the cover letter names
+#: as precedent for the submission's topic and level of technicality:
+#: Bache-Mathiesen 2022 (statistical methodology, 6(4):452-464), Hecksteden
+#: 2026 (injury-risk data analytics), Mkumbuzi 2023 (women's surveillance,
+#: 7(1):74-80), Impellizzeri 2019 (the journal's statistical recommendations,
+#: 3(1):1-2).
+SMF_PRECEDENTS = ("Bache-Mathiesen", "Hecksteden", "Mkumbuzi", "Impellizzeri")
+
+
+def test_cover_letter_precedent_articles_survive_in_both_copies():
+    """The letter grounds journal fit in the journal's own pages. It exists
+    twice (Markdown record, LaTeX for the PDF), and prose that lives twice
+    drifts unless both copies are held to the same names."""
+    md = COVER_LETTER.read_text(encoding="utf-8")
+    tex = (ROOT / "manuscript" / "cover_letter.tex").read_text(encoding="utf-8")
+    for name in SMF_PRECEDENTS:
+        assert name in md, ("cover_letter.md", name)
+        assert name in tex, ("cover_letter.tex", name)
 
 
 def test_paper_cites_the_record_it_is_archived_inside():

@@ -22,6 +22,20 @@ multi-sex rather than single-club: fifteen European first tiers, 658,286
 appearances, eight men's competitions across eight seasons and seven women's
 competitions from two independent data providers.
 
+**Precedent in your pages.** The topic and the level of technicality are both
+already the journal's own. *Science and Medicine in Football* has published
+statistical-methodology work on injury-risk analysis with no new cohort of its
+own — Bache-Mathiesen et al. on handling missing data in training-load and
+injury research (2022;6(4):452–464) — analytics-driven injury-risk work in its
+current volume — Hecksteden et al., "How to mitigate injury risk after
+return-to-play in elite football? Expert judgement meets data analytics"
+(2026) — and women's-football injury surveillance — Mkumbuzi et al. on the
+2020 COSAFA Women's Championship (2023;7(1):74–80). We placed this submission
+against those articles, and we wrote its statistics to the journal's own
+published recommendations (Impellizzeri, Meyer and Wagenpfeil, 2019;3(1):1–2):
+estimates with intervals throughout, every verdict read from interval bounds,
+and no reliance on significance language.
+
 **This is not descriptive match analytics.** It is a measurement-validity study
 for injury surveillance, and its output is a check a practitioner can run on
 data they already hold before any model is fitted. The check needs an
@@ -51,7 +65,7 @@ guaranteed for a manuscript with a preprint. One point of candour: the version
 posted at the time of writing (v2) predates the fifteen-league extension and
 states that the within-starter pattern held without exception. This manuscript
 supersedes that claim --- the restriction fails in Spain and Sweden --- and a
-replacement will be posted as a new version of the same record at submission,
+replacement has already been submitted as a new version of the same record,
 so that no reader has to reconcile two versions on their own.
 
 **Declarations.** The research received no specific grant from any funding

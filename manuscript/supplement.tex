@@ -3,7 +3,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath}
 % Times text and mathematics, matching the manuscript and the journal's font
-% instruction; and the journal's small, non-italicized p for p-values.
+% instruction; and the journal's small, non-italicised p for p-values.
 \usepackage{newtxtext,newtxmath}
 \newcommand{\pval}{\mathrm{p}}
 % Line numbers on the review copy, as on the manuscript, so referees can
@@ -176,7 +176,7 @@ Reference model & Club-season & 1.27 (1.09--1.47)\\
 
 \section{Absolute risk and exposure support}
 
-Standardised probabilities describe appearances by established players, averaged over the observed calendar-phase distribution with continuous prior history fixed at its sample median. The fitted probability was 5.56 per 1,000 appearances (95\% CI 4.84--6.28) at zero previous-seven-day minutes and 8.89 (7.19--10.60) at 180, a difference of 3.34 per 1,000 (1.31--5.37) by the delta method.
+Standardised probabilities describe appearances by established players, averaged over the observed calendar-phase distribution with continuous prior history fixed at its sample median. The fitted probability was 5.56 per 1000 appearances (95\% CI 4.84--6.28) at zero previous-seven-day minutes and 8.89 (7.19--10.60) at 180, a difference of 3.34 per 1000 (1.31--5.37) by the delta method.
 
 Support is uneven. Zero minutes covers 29,344 appearances (33.1\%, 162 same-day starts), 1--45 minutes 9,841 (11.1\%, 58), 46--90 minutes 37,905 (42.8\%, 273), 91--135 minutes 3,593 (4.1\%, 20) and 136--180 minutes 7,709 (8.7\%, 63). Above 180 minutes there were 181 appearances (0.2\%) and no same-day starts, so that region is excluded from every displayed curve.
 
@@ -184,7 +184,7 @@ Support is uneven. Zero minutes covers 29,344 appearances (33.1\%, 162 same-day 
 
 Every covariate in the appearance-selection model is fixed before the fixture, and no outcome column enters it. A spell start recorded on an appearance date never removes that appearance, because public episodes mark unavailability only from the day after onset. Automated gates confirmed that all 65,100 Premier League appearances and all 401 of their same-day spell starts were retained in the opportunity set. The 12,348 appearances outside the set are in other competitions, which have no reconstructed EPL fixture; this restricts scope rather than conditioning on the outcome.
 
-The included set contained 65,100 appearances by 1,112 players with 401 same-day starts (6.2 per 1,000); the excluded set contained 23,473 appearances by 1,086 players with 175 starts (7.5 per 1,000). Median previous-seven-day minutes were 75 versus 74 and median age 27.0 versus 26.7 years.
+The included set contained 65,100 appearances by 1,112 players with 401 same-day starts (6.2 per 1000); the excluded set contained 23,473 appearances by 1,086 players with 175 starts (7.5 per 1000). Median previous-seven-day minutes were 75 versus 74 and median age 27.0 versus 26.7 years.
 
 \section{Temporal refits}
 
@@ -248,7 +248,7 @@ That queue has now been searched under the pre-specified protocol deposited as \
 
 Searching first required knowing which records could be searched at all, and the screen that answers this is the more useful result. Counting days elapsed is uninformative, because in this calendar every long gap coincides with a scheduled break. Counting \emph{club fixtures missed} is not. \path{jsams_revised_non_event_absence_screen.csv} asks, for each queued appearance, how many fixtures the player's club played before that player next appeared. In 28 of the 30 the club played none: there was no absence for a report to have missed, so the record cannot be evidence of under-ascertainment. Of the remaining two, one gap spans a club change, so the missed fixtures are not absences; for the other the only public source is dated nine days after the appearance and describes an assessment rather than an injury, which rule B2 excludes. The screen assigns no verdicts and cannot: a player can be injured and miss nothing.
 
-The outcome is therefore 30 sampled, 30 unresolved, 0 resolved, and \path{jsams_revised_non_event_audit_summary.csv} records its status as \emph{reviewed, not resolved} rather than complete. The deposited queue file \path{jsams_revised_non_event_audit_queue.csv} preserves the blinded artifact exactly as issued to the searcher, its verdict column still reading \emph{pending}; the verdicts themselves live in the manual review file under \path{data/manual/}, and the summary reads them from there, so the two files describe the same records at different moments rather than disagreeing. Both are keyed by the same surrogates, which is what still joins a verdict to the appearance it judges once the identifiers are gone. The missed-event proportion and its Wilson interval remain \emph{unestimated} and the outcome's sensitivity is unknown. Zero confirmed missed events is not an estimate of zero. The same applies to reliability: \path{jsams_revised_second_assessor_agreement.csv} records zero compared rows, because no second assessor's codes exist, so Cohen's kappa for date attribution is unestimated. Both quantities are computed automatically by the archived code as soon as verdicts are supplied; we report them as unestimated rather than substituting a weaker proxy.
+The outcome is therefore 30 sampled, 30 unresolved, 0 resolved, and \path{jsams_revised_non_event_audit_summary.csv} records its status as \emph{reviewed, not resolved} rather than complete. The deposited queue file \path{jsams_revised_non_event_audit_queue.csv} preserves the blinded artefact exactly as issued to the searcher, its verdict column still reading \emph{pending}; the verdicts themselves live in the manual review file under \path{data/manual/}, and the summary reads them from there, so the two files describe the same records at different moments rather than disagreeing. Both are keyed by the same surrogates, which is what still joins a verdict to the appearance it judges once the identifiers are gone. The missed-event proportion and its Wilson interval remain \emph{unestimated} and the outcome's sensitivity is unknown. Zero confirmed missed events is not an estimate of zero. The same applies to reliability: \path{jsams_revised_second_assessor_agreement.csv} records zero compared rows, because no second assessor's codes exist, so Cohen's kappa for date attribution is unestimated. Both quantities are computed automatically by the archived code as soon as verdicts are supplied; we report them as unestimated rather than substituting a weaker proxy.
 
 \section{Recorded-minute denominator}
 
@@ -277,7 +277,7 @@ The difference does not depend on which seasons carry lineup data. It was $-20.4
 
 \section{Why a minute denominator attenuates the exposure association}
 
-For a Poisson model with a log-minutes offset, $\log E[y]=\log(m)+a+b_{\text{off}}x$, while the same model without the offset gives $\log E[y]=a'+b_{\text{app}}x$. To first order $b_{\text{off}}=b_{\text{app}}-\gamma$, where $\gamma$ is the slope of $\log(m)$ on the exposure. The attenuation caused by dividing by minutes is therefore predicted by $\gamma$ alone, and $\gamma$ has two possible sources: outcome truncation, and ordinary dependence of appearance length on the exposure.
+For a Poisson model with a log-minutes offset, $\log E[y]=\log(m)+a+b_{\text{off}}x$, while the same model without the offset gives $\log E[y]=a'+b_{\text{app}}x$. To first order $b_{\text{off}}=b_{\text{app}}-\gamma$, where $\gamma$ is the slope of $\log(m)$ on the exposure. The attenuation produced by dividing by minutes is therefore predicted by $\gamma$ alone, and $\gamma$ has two possible sources: outcome truncation, and ordinary dependence of appearance length on the exposure.
 
 \begin{table}[h]
 \centering
@@ -682,7 +682,7 @@ Type-specific text analysis is deposited rather than plotted. Conditioning binar
 
 \section{Clinical benchmark and national chronology}
 
-The combined same-day plus lag-1 proxy produced 17.6 reports per 1,000 observed match hours (95\% CI 16.8--18.4). Clinical-surveillance estimates of 23.8 and approximately 36 per 1,000 match hours use different cohorts and outcomes \cite{ekstrand2021injury_rates_decreased,denhollander2025imc_position}. Their ratio is not an ascertainment fraction, sensitivity estimate or validation.
+The combined same-day plus lag-1 proxy produced 17.6 reports per 1000 observed match hours (95\% CI 16.8--18.4). Clinical-surveillance estimates of 23.8 and approximately 36 per 1000 match hours use different cohorts and outcomes \cite{ekstrand2021injury_rates_decreased,denhollander2025imc_position}. Their ratio is not an ascertainment fraction, sensitivity estimate or validation.
 
 This benchmark divides by observed match hours, which is the denominator the rest of this paper shows is not neutral, and we report it in that form only because the surveillance estimates it is set beside are themselves denominated that way. It therefore inherits the gradient measured above: it is a comparison of like-denominated quantities, not an estimate we would defend on its own, and it is exactly the kind of figure the diagnostic in the main text is meant to be run against first. Nothing in the paper's argument rests on it.
 
