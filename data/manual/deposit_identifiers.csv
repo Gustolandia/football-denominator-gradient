@@ -1,0 +1,5 @@
+role,identifier,resolves_to,note
+concept,10.5281/zenodo.21940596,newest version of the record,"Cited in the manuscript and on the title page. A concept DOI resolves to the most recent version, so a reader who follows it gets the deposit that matches the published text rather than the one that happened to exist when the sentence was written."
+version_current,10.5281/zenodo.21940597,the version deposited for this submission,"The specific version the submitted manuscript was compiled from. Recorded here so the concept DOI in the prose can be checked against a fixed target, but deliberately not cited in prose."
+version_superseded,10.5281/zenodo.21673177,the first deposit of this work,"Superseded and restricted: earlier versions carried identified player names. Kept in this table so the lineage is documented rather than silently dropped."
+version_superseded,10.5281/zenodo.21673210,the second deposit of this work,"Superseded and restricted for the same reason. The de-identified replacement is the concept DOI above."

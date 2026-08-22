@@ -260,11 +260,38 @@ the previous implementation:
   the measured-confounding and clustering refits, the absolute-risk contrast
   and its exposure support, the included-versus-excluded selection population,
   and the denominator-contrast metadata.
-- `src/35_plot_jsams_revision.py` generates the four main manuscript figures
-  from the script-34 and script-36 CSVs. It does not refit models.
+- `src/35_plot_jsams_revision.py` generates all nine manuscript figures --- five
+  shown in the main paper and four in the supplement --- from the script-34,
+  script-36 and script-40 CSVs. It does not refit models.
+- `src/39_fetch_fbref_womens_appearances.py` assembles the women's appearance
+  panel, validating every match report before admitting it and replacing source
+  player identifiers with surrogates drawn at random.
+- `src/40_womens_denominator_gradient.py` fits the women's gradients by calling
+  script 37's estimator unchanged, so a difference between the populations
+  cannot come from two versions of one regression.
+- `src/41_womens_injury_record_audit.py` turns the matched injury-record audit
+  into the aggregates the paper reports. It deposits no individual record.
+- `src/42_statistical_output_appendix.py` refits all 30 reported gradients,
+  checks each against the deposited estimate and stops on any mismatch, then
+  writes the full statistical output the journal requires as an appendix.
+- `src/43_strobe_checklist.py` generates the STROBE checklist, resolving every
+  item against the manuscript source and failing rather than emitting an item
+  that points at text the manuscript does not contain.
+- `src/44_referee_response_analysis.py` computes the quantities the first round
+  of review asked for: the calibration of the first-order identity against the
+  attenuation observed, the translation of a gradient into the percentage of the
+  association it removes, ascertainment across squad roles, the clustering
+  sensitivity, and the precision each league panel delivered. It verifies its own
+  clustering baseline against the published gradient and stops on a mismatch. It also
+  sweeps a recorded-minute floor to measure how the identity’s over-prediction
+  varies with the gradient, rather than assuming one pooled ratio holds
+  everywhere; the unrestricted row must reproduce the published estimate exactly.
+  The sweep carries 95% intervals from 1000 player resamples in which the whole
+  sweep is recomputed, and the threshold cost is interpolated on each
+  replicate’s own curve, so its interval is a joint statement.
 - Obsolete Python scripts and stale result CSVs have been removed.
 - Every retained Python file has a corresponding test file. The final suite
-  passes 289 tests with 100.00% statement and branch coverage.
+  passes 446 tests with 100.00% statement and branch coverage.
 
 Secondary effect-modification interpretation: the earlier categorical model
 uses 72,445 intermediate/higher-history match rows and 1,592 combined proxy
@@ -501,6 +528,14 @@ epl_congestion/
 |  |- 34_jsams_referee_analysis.py
 |  |- 35_plot_jsams_revision.py
 |  |- 36_jsams_second_referee_analysis.py
+|  |- 37_denominator_gradient.py
+|  |- 39_fetch_fbref_womens_appearances.py
+|  |- 40_womens_denominator_gradient.py
+|  |- 41_womens_injury_record_audit.py
+|  |- 42_statistical_output_appendix.py
+|  |- 43_strobe_checklist.py
+|  |- 44_referee_response_analysis.py
+|  |- audit_identity.py
 |  |- pipeline_io.py
 |  |- public_data_sources.py
 |  `- v4_statistics.py
@@ -1035,10 +1070,21 @@ python src/31_public_data_v4_quality_registry.py
 python src/34_jsams_referee_analysis.py
 python src/36_jsams_second_referee_analysis.py
 python src/37_denominator_gradient.py
+python src/39_fetch_fbref_womens_appearances.py
+python src/40_womens_denominator_gradient.py
+python src/41_womens_injury_record_audit.py
 python src/35_plot_jsams_revision.py
+python src/42_statistical_output_appendix.py
+python src/43_strobe_checklist.py
+python src/44_referee_response_analysis.py
 python src/00_list_result_columns.py
 python src/24_prepare_public_deposit.py
 ```
+
+Scripts 39 to 41 need the women's source snapshots, which are fetched by the
+tools under `tools/` and are not redistributed; scripts 42 and 43 must run
+after the tables and the manuscript they check are in their final state, since
+each verifies the other artifacts rather than producing new estimates.
 
 The v4 scripts write the following audit artifacts under
 `data/processed/public_data_v4/`:

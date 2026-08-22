@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Mapping
 
 import matplotlib
 
@@ -31,6 +31,12 @@ RED = "#B6463A"
 INK = "#17212B"
 MUTED = "#5A6875"
 GRID = "#D9E0E5"
+# Figure 1's third panel compares two denominators, not two event states, and
+# reusing panel B's red/blue there made a reader carry the wrong mapping across
+# the figure. Gold and teal are reserved for the denominator contrast and used
+# nowhere else, so within one figure a colour means one thing.
+GOLD = "#B07A18"
+TEAL = "#1F6F6F"
 
 EXPOSURE_LABELS = {
     "prior_minutes_3d": "3-day minutes (per 90)",
@@ -110,7 +116,10 @@ def gradient_source_digest(gradients: pd.DataFrame) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
-def figure_manifest(gradients: pd.DataFrame) -> pd.DataFrame:
+def figure_manifest(
+    gradients: pd.DataFrame,
+    population_gradients: pd.DataFrame | None = None,
+) -> pd.DataFrame:
     """Record what the figures were drawn from, so they can be gated.
 
     Figures were the last artifact class nothing checked: a label could go
@@ -136,8 +145,27 @@ def figure_manifest(gradients: pd.DataFrame) -> pd.DataFrame:
             ("J4_jsams_context_support", "", ""),
             ("J5_jsams_negative_control_exposure", "", ""),
             ("J6_jsams_primary_robustness", "", ""),
+            # Neither of these plots a league table, so neither carries a
+            # digest; both are gated on existence and format like J1.
+            ("J8_jsams_identity_calibration", "", ""),
+            ("J9_jsams_decision_rule", "", ""),
         )
     ]
+    if population_gradients is not None:
+        _required(population_gradients, ["population", "league"], "population gradients")
+        rows.append(
+            {
+                "figure": "J7_jsams_gradient_by_population",
+                "formats": "png+pdf",
+                "league_labels": "|".join(
+                    f"{population}:{label}"
+                    for population, label in zip(
+                        population_gradients["population"], population_gradients["league"]
+                    )
+                ),
+                "source_digest": gradient_source_digest(population_gradients),
+            }
+        )
     out = pd.DataFrame(rows)
     out["interpretation"] = (
         "what script 35 drew, deposited so the gates can compare the figures' "
@@ -261,9 +289,19 @@ def plot_cohort_and_denominator(
     if len(selected) != len(selected_stages):
         raise ValueError("flow is missing a required display stage")
 
-    fig, axes = plt.subplots(
-        1, 3, figsize=(19.8, 6.9), gridspec_kw={"width_ratios": [1.12, 1.16, 1.0]}
+    # Two rows, not one. At 3.3:1 the single-row version reduced to a journal
+    # column width left the tick labels in panels B and C unreadable in print;
+    # the forest panel needs the full width, so it takes the second row alone.
+    fig = plt.figure(figsize=(13.8, 11.4))
+    grid = fig.add_gridspec(
+        2, 2, height_ratios=[1.0, 1.08], width_ratios=[1.0, 1.14],
+        hspace=0.30, wspace=0.24,
     )
+    axes = [
+        fig.add_subplot(grid[0, 0]),
+        fig.add_subplot(grid[0, 1]),
+        fig.add_subplot(grid[1, :]),
+    ]
     axis = axes[0]
     axis.set_xlim(0, 1)
     axis.set_ylim(0, 1)
@@ -278,9 +316,7 @@ def plot_cohort_and_denominator(
         f"among {int(by_stage.loc[3, 'players']):,} players",
         f"{int(by_stage.loc[8, 'players']):,} players | "
         f"{int(by_stage.loc[8, 'records']):,} eligible appearances\n"
-        f"{int(by_stage.loc[8, 'same_day_events']):,} same-day | "
-        f"{int(by_stage.loc[8, 'lag1_events']):,} lag-1 | "
-        f"{int(by_stage.loc[8, 'combined_proxy_events']):,} combined",
+        f"{int(by_stage.loc[8, 'same_day_events']):,} same-day spell starts",
     ]
     top, step, height = 0.80, 0.215, 0.125
     centre = 0.46
@@ -355,7 +391,7 @@ def plot_cohort_and_denominator(
     tick_positions = []
     tick_labels = []
     for index, (role, denominator, row) in enumerate(rows):
-        colour = MUTED if denominator == "fixed_90" else RED
+        colour = GOLD if denominator == "fixed_90" else TEAL
         _forest_point(
             axes[2], float(row["estimate"]), float(row["ci_low"]),
             float(row["ci_high"]), float(y_positions[index]), colour,
@@ -386,11 +422,21 @@ def plot_cohort_and_denominator(
         "C. The denominator gap nearly closes within starters, and nowhere else",
         loc="left", fontsize=12.5, fontweight="bold",
     )
+    # A legend, because panel C now has a palette of its own and a reader
+    # arriving from panel B must not carry that mapping across.
+    axes[2].legend(
+        handles=[
+            Line2D([0], [0], marker="o", color=GOLD, linestyle="none",
+                   markerfacecolor="white", label="Fixed 90-minute offset"),
+            Line2D([0], [0], marker="o", color=TEAL, linestyle="none",
+                   label="Recorded-minute offset"),
+        ],
+        loc="lower right", frameon=False, fontsize=9.0,
+    )
     fig.suptitle(
         "The recorded-minute denominator: what is truncated, and what that truncation explains",
         x=0.035, ha="left", fontsize=15.5, fontweight="bold", color=INK,
     )
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
     _save(fig, output_path)
 
 
@@ -898,6 +944,458 @@ def plot_denominator_gradient(
     _save(fig, output_path)
 
 
+def plot_gradient_by_population(
+    combined: pd.DataFrame,
+    output_path: Path,
+    threshold: float = 0.05,
+) -> None:
+    """Plot the gradient in men's and women's leagues, pooled beside restricted.
+
+    The men's leagues alone cannot separate two explanations of the gradient:
+    that squads are rotated, or that men's football is recorded a particular
+    way. Women's leagues differ in squad size, fixture density, season geometry
+    and data provider, so a gradient that behaves the same way in both is
+    evidence for the first and against the second.
+
+    Two panels, not one. The pooled gradients live between 0.43 and 0.66 and the
+    within-starter gradients between 0.02 and 0.05, so a shared linear axis
+    spends two-thirds of its width on empty space and compresses the restricted
+    series into an illegible sliver against the spine. That series carries the
+    paper's most qualified finding --- that the remedy fails in two leagues ---
+    and a figure that hides its own exception argues against the text it
+    illustrates. Independent scales cost a shared gridline and buy the reader
+    the ability to check the claim.
+
+    Leagues are sorted by pooled gradient within population, so the overlap
+    between the two ranges is visible rather than asserted, and the leagues
+    where the restricted bound still clears the threshold are drawn in the
+    warning colour and named in the panel.
+    """
+    _required(
+        combined,
+        ["population", "league", "n_appearances", "gamma_pooled",
+         "gamma_pooled_ci_low", "gamma_pooled_ci_high", "gamma_within_starters",
+         "gamma_within_starters_ci_low", "gamma_within_starters_ci_high"],
+        "population gradient",
+    )
+
+    # Women first in list order so the men's block sits on top once matplotlib
+    # counts upwards; ascending within each block so the largest is uppermost.
+    blocks = [
+        combined[combined["population"] == "women"].sort_values("gamma_pooled"),
+        combined[combined["population"] == "men"].sort_values("gamma_pooled"),
+    ]
+    ordered = pd.concat(blocks, ignore_index=True)
+
+    labels = []
+    exceeds = []
+    for row in ordered.itertuples(index=False):
+        starters_absent = not np.isfinite(float(row.gamma_within_starters))
+        over = (
+            (not starters_absent)
+            and float(row.gamma_within_starters_ci_high) > threshold
+        )
+        exceeds.append(over)
+        dagger = " \u2020" if starters_absent else ""
+        labels.append(f"{row.league} (n = {int(row.n_appearances):,}){dagger}")
+
+    fig, axes = plt.subplots(
+        1, 2, figsize=(13.4, 0.46 * len(ordered) + 3.4), sharey=True,
+        gridspec_kw={"width_ratios": [1.22, 1.0]},
+    )
+    positions = np.arange(len(ordered), dtype=float)
+
+    for index, row in ordered.iterrows():
+        _forest_point(
+            axes[0], float(row["gamma_pooled"]), float(row["gamma_pooled_ci_low"]),
+            float(row["gamma_pooled_ci_high"]), positions[index], RED,
+        )
+        if np.isfinite(float(row["gamma_within_starters"])):
+            colour = RED if exceeds[index] else BLUE
+            _forest_point(
+                axes[1], float(row["gamma_within_starters"]),
+                float(row["gamma_within_starters_ci_low"]),
+                float(row["gamma_within_starters_ci_high"]), positions[index],
+                colour, fill=False,
+            )
+
+    boundary = int((ordered["population"] == "women").sum())
+    for axis in axes:
+        axis.axhline(boundary - 0.5, color=MUTED, linewidth=1.0, linestyle=":")
+        axis.grid(axis="x", color=GRID, linewidth=0.8)
+        axis.set_axisbelow(True)
+        axis.set_ylim(-0.8, len(ordered) - 0.2)
+
+    axes[0].set_yticks(positions, labels, fontsize=9.2)
+    axes[0].set_xlim(
+        float(ordered["gamma_pooled_ci_low"].min()) - 0.04,
+        float(ordered["gamma_pooled_ci_high"].max()) + 0.04,
+    )
+    axes[0].set_xlabel("Pooled gradient $\\gamma$, all appearances (95% CI)")
+    axes[0].set_title(
+        "A. Every league, all appearances", loc="left", fontsize=12.5,
+        fontweight="bold",
+    )
+
+    starter_high = float(ordered["gamma_within_starters_ci_high"].max(skipna=True))
+    axes[1].set_xlim(0.0, max(threshold * 1.45, starter_high * 1.22))
+    axes[1].axvline(threshold, color=INK, linestyle="--", linewidth=1.2)
+    axes[1].set_xlabel("Gradient $\\gamma$ within starters (95% CI)")
+    axes[1].set_title(
+        "B. The same leagues, restricted to starters", loc="left", fontsize=12.5,
+        fontweight="bold",
+    )
+    axes[1].annotate(
+        f"negligible ({threshold:g})",
+        xy=(threshold, len(ordered) - 0.45),
+        xytext=(threshold + starter_high * 0.10, len(ordered) - 0.45),
+        color=INK, fontsize=8.8, va="center",
+    )
+
+    # The population labels mark the paper's principal contrast, so they are
+    # set in the text colour rather than the grid colour and given room of
+    # their own outside the plotted area.
+    named = [
+        str(row.league).split(",")[0]
+        for row, over in zip(ordered.itertuples(index=False), exceeds)
+        if over
+    ]
+    handles = [
+        Line2D([0], [0], marker="o", color=RED, linestyle="none",
+               label="Pooled over all appearances"),
+        Line2D([0], [0], marker="o", color=BLUE, linestyle="none",
+               markerfacecolor="white", label="Within starters, below threshold"),
+    ]
+    if named:
+        handles.append(
+            Line2D([0], [0], marker="o", color=RED, linestyle="none",
+                   markerfacecolor="white",
+                   label="Within starters, bound above threshold: "
+                         + " and ".join(named))
+        )
+    if any(label.endswith("\u2020") for label in labels):
+        handles.append(Line2D([0], [0], marker="none", color="none",
+                              label="\u2020 source publishes no lineup box"))
+    fig.legend(
+        handles=handles, loc="lower center", bbox_to_anchor=(0.5, -0.005),
+        ncol=2, frameon=False, fontsize=9.2,
+    )
+    fig.suptitle(
+        "The denominator gradient in men's and women's leagues",
+        x=0.035, ha="left", fontsize=15.0, fontweight="bold", color=INK,
+    )
+    fig.tight_layout(rect=(0.05, 0.07, 1, 0.94))
+
+    # Placed after the layout, and measured rather than guessed. A fixed offset
+    # printed MEN through "France, Ligue 1"; measuring before tight_layout then
+    # printed WOMEN through the "E" of "England, FA Women's Super League",
+    # because the axis had not yet been given its final width. The widest tick
+    # label as finally rendered is the only quantity that cannot be outgrown.
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    axis_width = axes[0].get_window_extent(renderer=renderer).width
+    widest_label = max(
+        text.get_window_extent(renderer=renderer).width
+        for text in axes[0].get_yticklabels()
+    )
+    population_offset = -(widest_label / axis_width) - 0.055
+
+    for label, centre in (
+        ("WOMEN", (boundary - 1) / 2.0),
+        ("MEN", boundary + (len(ordered) - boundary - 1) / 2.0),
+    ):
+        axes[0].text(
+            population_offset, centre, label, rotation=90, va="center", ha="center",
+            fontsize=11.5, color=INK, fontweight="bold",
+            transform=axes[0].get_yaxis_transform(), clip_on=False,
+        )
+
+    _save(fig, output_path)
+
+
+def plot_identity_calibration(
+    calibration: pd.DataFrame,
+    translation: pd.DataFrame,
+    curve: pd.DataFrame,
+    output_path: Path,
+    threshold: float = 0.05,
+) -> None:
+    """Show that the over-prediction ratio is a function of the gradient.
+
+    The identity says the attenuation equals the gradient. It does not, and the
+    discrepancy is not a constant either: it grows with the gradient, from
+    roughly one where the gradient is small to about two where it is large.
+
+    That distinction is the whole point of this figure. An earlier version
+    divided by the pooled ratio everywhere, which put a factor of two into the
+    neighbourhood of the reporting threshold --- the one part of the range a
+    practitioner reads. Panel A now plots the ratio as it was measured, by
+    sweeping a recorded-minute floor that shrinks the offset's room to vary
+    while holding the outcome, the exposure and the specification fixed. Panel B
+    draws the consequence, solid where the ratio was measured and dotted where
+    it is extrapolated, because a line is a claim about what is known.
+    """
+    _required(
+        calibration,
+        ["stratum", "gamma_predicted_attenuation", "observed_attenuation",
+         "over_prediction_ratio"],
+        "identity calibration",
+    )
+    _required(
+        translation,
+        ["gamma", "naive_percent_understatement", "calibrated_percent_understatement"],
+        "threshold translation",
+    )
+    _required(
+        curve,
+        ["gamma", "gamma_ci_low", "gamma_ci_high", "observed_attenuation",
+         "attenuation_ci_low", "attenuation_ci_high", "over_prediction_ratio"],
+        "calibration curve",
+    )
+
+    fig, axes = plt.subplots(1, 2, figsize=(13.4, 5.8))
+    ordered = curve.sort_values("gamma")
+
+    # Logarithmic axes, for two reasons. The sweep spans two and a half orders
+    # of magnitude, so on linear axes every small-gradient point sits in one
+    # illegible corner and its interval cannot be seen -- and the reviewer who
+    # asked for the intervals asked that the widening be visible, not stated.
+    # And on log axes the identity is still the diagonal while a point's
+    # vertical distance below it is exactly the log of the over-prediction
+    # ratio, so the panel's geometry becomes the quantity under discussion.
+    low = float(min(ordered["gamma_ci_low"].min(),
+                    ordered["attenuation_ci_low"].min())) * 0.7
+    high = float(
+        max(calibration["gamma_predicted_attenuation"].max(), ordered["gamma"].max())
+    ) * 1.4
+    axes[0].set_xscale("log")
+    axes[0].set_yscale("log")
+    axes[0].set_xlim(low, high)
+    axes[0].set_ylim(low, high)
+    axes[0].plot([low, high], [low, high], color=INK, linestyle="--", linewidth=1.2)
+    axes[0].annotate(
+        "identity: attenuation = $\\gamma$", xy=(0.03, 0.03),
+        xytext=(0.0015, 0.10), color=INK, fontsize=9.2,
+        arrowprops={"arrowstyle": "->", "color": INK, "lw": 0.9},
+    )
+    axes[0].plot(
+        ordered["gamma"], ordered["observed_attenuation"], color=TEAL, linewidth=1.9,
+        label="Measured sweep (recorded-minute floor)",
+    )
+    # Error bars, not just points: the sweep's smallest strata carry wide
+    # intervals, and a reviewer asked that the widening be visible rather than
+    # only stated. Horizontal bars are the gradient's clustered interval,
+    # vertical bars the attenuation's player-bootstrap interval.
+    axes[0].errorbar(
+        ordered["gamma"], ordered["observed_attenuation"],
+        xerr=[
+            ordered["gamma"] - ordered["gamma_ci_low"],
+            ordered["gamma_ci_high"] - ordered["gamma"],
+        ],
+        yerr=[
+            (ordered["observed_attenuation"] - ordered["attenuation_ci_low"]).clip(lower=0.0),
+            (ordered["attenuation_ci_high"] - ordered["observed_attenuation"]).clip(lower=0.0),
+        ],
+        fmt="o", color=TEAL, markersize=4.4, capsize=2.4, linewidth=1.1,
+    )
+    # On log axes the three large-gradient strata sit close together, so each
+    # label gets its own offset instead of one shared rule; a shared rule
+    # stacked all three into one unreadable pile.
+    label_offsets = {
+        "all": ((-8, -16), "right"),
+        "starting_lineup": ((10, -3), "left"),
+        "substitute_list": ((-10, 4), "right"),
+        "lineup_unavailable_or_other": ((7, 5), "left"),
+    }
+    for row in calibration.itertuples(index=False):
+        x = float(row.gamma_predicted_attenuation)
+        y = float(row.observed_attenuation)
+        axes[0].plot(x, y, marker="s", color=RED, markersize=7.5, linestyle="none")
+        offset, align = label_offsets.get(str(row.stratum), ((10, 6), "left"))
+        axes[0].annotate(
+            STRATUM_DISPLAY.get(str(row.stratum), str(row.stratum)),
+            xy=(x, y), xytext=offset,
+            textcoords="offset points", fontsize=8.8, color=INK, ha=align,
+        )
+    axes[0].plot([], [], marker="s", color=RED, linestyle="none",
+                 label="Squad-role strata")
+    axes[0].set_xlabel("Denominator gradient $\\gamma$ (log-coefficient units, log axis)")
+    axes[0].set_ylabel("Observed attenuation (log-coefficient units, log axis)")
+    axes[0].grid(color=GRID, linewidth=0.8)
+    axes[0].set_axisbelow(True)
+    axes[0].legend(frameon=False, fontsize=8.8, loc="lower right")
+    axes[0].set_title(
+        "A. The gap from the identity grows with $\\gamma$",
+        loc="left", fontsize=12.5, fontweight="bold",
+    )
+
+    grid_gamma = np.linspace(0.0, float(translation["gamma"].max()), 240)
+    ratios = np.interp(grid_gamma, ordered["gamma"], ordered["over_prediction_ratio"])
+    calibrated = 100.0 * (1.0 - np.exp(-grid_gamma / ratios))
+    naive = 100.0 * (1.0 - np.exp(-grid_gamma))
+    measured = (grid_gamma >= float(ordered["gamma"].min())) & (
+        grid_gamma <= float(ordered["gamma"].max())
+    )
+
+    axes[1].plot(grid_gamma, naive, color=INK, linestyle="--", linewidth=1.5,
+                 label="If $\\gamma$ is read at face value")
+    axes[1].plot(np.where(measured, grid_gamma, np.nan), np.where(measured, calibrated, np.nan),
+                 color=TEAL, linewidth=2.1, label="Calibrated, ratio measured")
+    axes[1].plot(np.where(~measured, grid_gamma, np.nan), np.where(~measured, calibrated, np.nan),
+                 color=TEAL, linewidth=1.6, linestyle=":",
+                 label="Calibrated, ratio extrapolated")
+
+    marked = translation[translation["gamma"].eq(threshold)]
+    if len(marked):
+        cost = float(marked["calibrated_percent_understatement"].iloc[0])
+        ratio_here = float(marked["over_prediction_ratio"].iloc[0])
+        axes[1].axvline(threshold, color=MUTED, linestyle=":", linewidth=1.2)
+        axes[1].annotate(
+            f"threshold {threshold:g}: {cost:.1f}% of the rate ratio\n"
+            f"(ratio {ratio_here:.2f} at this $\\gamma$)",
+            xy=(threshold, cost), xytext=(threshold + 0.055, cost + 7.5),
+            color=INK, fontsize=9.0,
+            arrowprops={"arrowstyle": "->", "color": MUTED, "lw": 0.9},
+        )
+    axes[1].set_xlabel("Denominator gradient $\\gamma$ (log-coefficient units)")
+    axes[1].set_ylabel("Rate ratio divided away (% of the ratio)")
+    axes[1].grid(color=GRID, linewidth=0.8)
+    axes[1].set_axisbelow(True)
+    axes[1].legend(frameon=False, fontsize=8.8, loc="upper left")
+    axes[1].set_title(
+        "B. What a gradient costs the answer", loc="left", fontsize=12.5,
+        fontweight="bold",
+    )
+
+    fig.suptitle(
+        "Calibrating the gradient against the attenuation it predicts",
+        x=0.035, ha="left", fontsize=15.0, fontweight="bold", color=INK,
+    )
+    fig.tight_layout(rect=(0, 0, 1, 0.92))
+    _save(fig, output_path)
+
+
+STRATUM_DISPLAY = {
+    "all": "All appearances",
+    "starting_lineup": "Starters",
+    "substitute_list": "Substitutes",
+    "lineup_unavailable_or_other": "Lineup unknown",
+}
+
+
+def plot_decision_rule(
+    rule_counts: Mapping[str, int],
+    output_path: Path,
+    threshold: float = 0.05,
+) -> None:
+    """Draw the check a practitioner runs before dividing by playing time.
+
+    Everything else in this paper is evidence that the check is needed. This is
+    the check. It reads interval bounds rather than point estimates, it needs an
+    appearance table and no injury data at all, and it ends in one of three
+    places rather than in a recommendation to think harder.
+
+    The tallies are the fifteen leagues measured here, so a reader can see that
+    the rule is not hypothetical and that its branches are not all decorative:
+    two leagues genuinely land in the third box.
+    """
+    fig, axis = plt.subplots(figsize=(12.6, 7.2))
+    axis.set_xlim(0, 1)
+    axis.set_ylim(0, 1)
+    axis.axis("off")
+
+    def box(x, y, width, height, text, edge, face, weight="normal", size=10.0):
+        axis.add_patch(
+            FancyBboxPatch(
+                (x - width / 2, y - height / 2), width, height,
+                boxstyle="round,pad=0.006,rounding_size=0.018",
+                edgecolor=edge, facecolor=face, linewidth=1.5,
+            )
+        )
+        axis.text(
+            x, y, text, ha="center", va="center", fontsize=size, color=INK,
+            fontweight=weight, linespacing=1.5,
+        )
+
+    def arrow(x0, y0, x1, y1, label=None, side="right"):
+        axis.annotate(
+            "", xy=(x1, y1), xytext=(x0, y0),
+            arrowprops={"arrowstyle": "-|>", "color": MUTED, "lw": 1.5},
+        )
+        if label:
+            offset = 0.022 if side == "right" else -0.022
+            axis.text(
+                (x0 + x1) / 2 + offset, (y0 + y1) / 2, label, fontsize=9.6,
+                color=MUTED, ha="left" if side == "right" else "right",
+                va="center", fontweight="bold",
+            )
+
+    # Terminal boxes carry four lines including the tally, so they are set
+    # taller than the decision boxes; an earlier version spilled its first and
+    # last lines outside the rounded rectangle.
+    box(0.5, 0.93, 0.62, 0.10,
+        "Fit $\\gamma$: log recorded minutes on the workload under study,\n"
+        "from appearance records alone \u2014 no injury data required",
+        BLUE, "#F3F7FA", weight="bold")
+
+    box(0.5, 0.745, 0.44, 0.075,
+        f"Is the lower bound of $\\gamma$ above {threshold:g}?", INK, "white")
+    arrow(0.5, 0.878, 0.5, 0.786)
+
+    box(0.185, 0.475, 0.33, 0.21,
+        "Dividing is a neutral rescaling.\n"
+        "Report the per-hour rate,\n"
+        f"and report $\\gamma$ with it.\n\n{rule_counts.get('neutral', 0)} of 15 leagues",
+        TEAL, "#EFF6F5")
+    arrow(0.40, 0.712, 0.235, 0.585, "no", side="left")
+
+    box(0.66, 0.545, 0.38, 0.085,
+        "Refit within regular starters.\n"
+        f"Is the upper bound at or below {threshold:g}?", INK, "white")
+    arrow(0.60, 0.708, 0.655, 0.592, "yes")
+
+    box(0.45, 0.185, 0.33, 0.21,
+        "Restrict to starters.\n"
+        "The per-minute rate is then\n"
+        f"safe to report.\n\n{rule_counts.get('restrict', 0)} of 15 leagues",
+        BLUE, "#F3F7FA")
+    arrow(0.575, 0.500, 0.475, 0.295, "yes", side="left")
+
+    box(0.845, 0.185, 0.30, 0.21,
+        "Report risk per appearance.\n"
+        "No restriction available here\n"
+        f"removes the gradient.\n\n{rule_counts.get('per_appearance', 0)} of 15 leagues",
+        RED, "#FBF1F0")
+    arrow(0.755, 0.500, 0.835, 0.295, "no")
+
+    # A quarter of the reference cohort has no lineup status, and most public
+    # providers publish none at all. Those readers cannot enter the second
+    # decision, so the figure says where they go instead of leaving them at a
+    # branch they cannot take.
+    axis.annotate(
+        "No lineup data?\nReport risk per appearance.",
+        xy=(0.935, 0.292), xytext=(0.995, 0.705),
+        ha="right", va="center", fontsize=9.2, color=RED,
+        bbox={"boxstyle": "round,pad=0.35", "facecolor": "#FBF1F0",
+              "edgecolor": RED, "linewidth": 1.0},
+        arrowprops={"arrowstyle": "-|>", "color": RED, "lw": 1.2,
+                    "linestyle": "--"},
+    )
+
+    axis.text(
+        0.5, 0.025,
+        "Read every verdict from interval bounds, never from point estimates. "
+        "The threshold is a reporting convention, not a test.",
+        ha="center", va="center", fontsize=9.6, color=MUTED, style="italic",
+    )
+    fig.suptitle(
+        "The check to run before dividing injury counts by playing time",
+        x=0.035, ha="left", fontsize=15.0, fontweight="bold", color=INK,
+    )
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    _save(fig, output_path)
+
+
 def main() -> None:  # pragma: no cover
     root = Path(__file__).resolve().parents[1]
     results = root / "data" / "processed" / "results"
@@ -915,7 +1413,17 @@ def main() -> None:  # pragma: no cover
         gradients,
         figures / "J2_jsams_denominator_gradient.png",
     )
-    figure_manifest(gradients).to_csv(
+    # The men-and-women panel is drawn only once the women's leagues have been
+    # measured, so a run without that snapshot still produces the six figures
+    # the manuscript already depends on.
+    population_path = results / "jsams_denominator_gradient_by_population.csv"
+    population = pd.read_csv(population_path) if population_path.exists() else None
+    if population is not None:
+        plot_gradient_by_population(
+            population,
+            figures / "J7_jsams_gradient_by_population.png",
+        )
+    figure_manifest(gradients, population).to_csv(
         results / "jsams_revised_figure_manifest.csv", index=False
     )
     plot_primary_and_multiverse(
@@ -941,7 +1449,30 @@ def main() -> None:  # pragma: no cover
         pd.read_csv(results / "jsams_revised_exposure_multiverse.csv"),
         figures / "J4_jsams_context_support.png",
     )
-    print(f"Wrote six JSAMS revision figures to {figures}")
+    plot_identity_calibration(
+        pd.read_csv(results / "jsams_identity_calibration.csv"),
+        pd.read_csv(results / "jsams_threshold_translation.csv"),
+        pd.read_csv(results / "jsams_calibration_curve.csv"),
+        figures / "J8_jsams_identity_calibration.png",
+    )
+    # The tallies come from the two decision-rule tables rather than from a
+    # constant, so a league that changes verdict changes the figure.
+    mens_rule = pd.read_csv(
+        results / "jsams_revised_denominator_gradient_decision_rule.csv"
+    )
+    womens_rule = pd.read_csv(
+        results / "jsams_womens_denominator_gradient_decision_rule.csv"
+    )
+    verdicts = pd.concat([mens_rule, womens_rule], ignore_index=True)["recommendation"]
+    plot_decision_rule(
+        {
+            "neutral": int((verdicts == "report per minute").sum()),
+            "restrict": int((verdicts == "restrict to starters").sum()),
+            "per_appearance": int((verdicts == "report per appearance").sum()),
+        },
+        figures / "J9_jsams_decision_rule.png",
+    )
+    print(f"Wrote nine JSAMS revision figures to {figures}")
 
 
 if __name__ == "__main__":  # pragma: no cover

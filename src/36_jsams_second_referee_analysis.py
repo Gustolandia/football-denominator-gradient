@@ -676,6 +676,7 @@ def placebo_denominator_replication(frame: pd.DataFrame) -> pd.DataFrame:
         rows.append(
             {
                 "quantity": denominator,
+                "effect_measure": EFFECT_MEASURE[denominator],
                 "value": float(np.exp(estimate)),
                 "ci_low": float(np.exp(estimate - critical * standard_error)),
                 "ci_high": float(np.exp(estimate + critical * standard_error)),
@@ -1506,6 +1507,25 @@ STARTER_ROLE = "starting_lineup"
 SUBSTITUTE_ROLE = "substitute_list"
 UNKNOWN_ROLE = "lineup_unavailable_or_other"
 
+#: What exp(beta) actually means under each denominator.
+#:
+#: A per-appearance model is logistic and returns an odds ratio. A fixed-90 or
+#: recorded-minute model is Poisson with a log link and an offset, and returns a
+#: rate ratio. These are different estimands, and in this cohort they are also
+#: nearly the same number: the per-appearance odds ratio is 1.267 and the
+#: fixed-90 rate ratio 1.265, because the outcome is rare enough that the odds
+#: and the rate almost coincide. That coincidence is a finding worth reporting
+#: and a trap worth avoiding, and a first submission fell into it by calling a
+#: Poisson estimate an odds ratio in its own abstract.
+#:
+#: The label therefore travels in the table beside the estimate, so the
+#: manuscript reads it rather than reapplying it from memory.
+EFFECT_MEASURE = {
+    "per_appearance": "odds_ratio",
+    "fixed_90": "rate_ratio",
+    "observed_minutes": "rate_ratio",
+}
+
 
 def recorded_minute_distribution(frame: pd.DataFrame) -> pd.DataFrame:
     """Describe recorded appearance length by event status and lineup role.
@@ -1633,6 +1653,7 @@ def denominator_by_lineup_role(frame: pd.DataFrame) -> pd.DataFrame:
                 {
                     "lineup_role": role,
                     "denominator": "per_appearance",
+                    "effect_measure": EFFECT_MEASURE["per_appearance"],
                     "estimate": np.nan,
                     "ci_low": np.nan,
                     "ci_high": np.nan,
@@ -1650,6 +1671,7 @@ def denominator_by_lineup_role(frame: pd.DataFrame) -> pd.DataFrame:
                 {
                     "lineup_role": role,
                     "denominator": denominator,
+                    "effect_measure": EFFECT_MEASURE[denominator],
                     "estimate": row["estimate"],
                     "ci_low": row["ci_low"],
                     "ci_high": row["ci_high"],
@@ -4263,6 +4285,95 @@ def revised_claim_hierarchy(
             "required_caveat": (
                 "The threshold is a reporting convention, not a test. The gradient and "
                 "its interval should be reported whatever the verdict."
+            ),
+        },
+        {
+            "claim_id": "denominator_gradient_replicated_in_womens_leagues",
+            "tier": 2,
+            "claim_role": "primary_original_measurement",
+            "tier_justification": (
+                "Not Tier 5 or 4: a positive measurement in a population nobody has "
+                "measured replicates nobody and is not a null. Not Tier 3: it "
+                "contradicts nothing and surprises only by agreeing. The Tier 1 case is "
+                "that the men's result could have been a fact about men's football or "
+                "about one data provider, and the women's leagues change country, squad "
+                "size, fixture calendar, season geometry, sex and provider at once "
+                "without changing the gradient. It is declined for the same reason the "
+                "men's measurement is: the existence of the bias was established "
+                "analytically beforehand, so what is new is its size and reach. "
+                "Ambiguity resolves downward by rule."
+            ),
+            "abstract_visible": True,
+            "main_display_recommended": True,
+            "evidence": (
+                "Seven European women's first tiers, 29,799 appearances from match "
+                "reports alone with no injury data: the pooled gradient runs 0.444 to "
+                "0.647 against 0.431 to 0.655 in the men's eight, and clears the "
+                "negligible threshold in all fifteen leagues across both populations."
+            ),
+            "required_caveat": (
+                "One season per women's league against a multi-season men's window, and "
+                "a different provider; the magnitude is local to each panel and only the "
+                "mechanism generalises."
+            ),
+        },
+        {
+            "claim_id": "starter_restriction_is_league_specific",
+            "tier": 3,
+            "claim_role": "surprising_boundary_on_the_proposed_remedy",
+            "tier_justification": (
+                "Tier 3: the remedy this paper recommends was expected to work wherever "
+                "the gradient appeared, and in two of seven women's leagues it does not. "
+                "It is recorded as a boundary on our own claim rather than as a Tier 2 "
+                "original finding because its content is where a proposed fix stops "
+                "working, and the rule assigns the lower tier where the category is "
+                "arguable. It is not Tier 4 or 5: a limit on the remedy is neither a "
+                "replication nor an uninformative null."
+            ),
+            "abstract_visible": True,
+            "main_display_recommended": True,
+            "evidence": (
+                "Within-starter upper bounds reach 0.050 in Spain and 0.058 in Sweden, "
+                "so the decision rule returns 'report per appearance' rather than "
+                "'restrict to starters' in two of seven women's leagues, against eight "
+                "of eight in the men's."
+            ),
+            "required_caveat": (
+                "An observed boundary in one season per league, not a tested hypothesis "
+                "about those leagues; the rule reads interval bounds, so a wider "
+                "interval alone can produce this verdict."
+            ),
+        },
+        {
+            "claim_id": "womens_public_injury_record_quality",
+            "tier": 4,
+            "claim_role": "measurement_quality_audit_governing_scope",
+            "tier_justification": (
+                "Tier 4: a matched characterisation of two public records that governs "
+                "how far this study's outcome analysis may reach. It is not Tier 3: it "
+                "contradicts no published claim and surprises nobody who has used these "
+                "sources. It is not Tier 2: it is a property of the data providers "
+                "rather than of football, and it establishes a scope restriction rather "
+                "than a finding. It is kept out of the abstract deliberately, because an "
+                "abstract sentence about record quality would displace a result, while "
+                "the restriction it justifies is stated in the methods, results and "
+                "limitations where a reader can act on it."
+            ),
+            "abstract_visible": False,
+            "main_display_recommended": True,
+            "evidence": (
+                "Applying one sampling frame and one parser to both records: 66.2 per "
+                "cent of sampled women's players carry any recorded spell against 85.9 "
+                "per cent of men's, at 2.0 against 6.4 spells per player; per-capita "
+                "recording in 2019-20 stands at 0.07 of its 2024-25 level against 0.43 "
+                "for men; cruciate injuries are 9.9 per cent of recorded women's spells "
+                "against 1.2 per cent of men's."
+            ),
+            "required_caveat": (
+                "Current squads sampled, so the frame is the same for both populations "
+                "but is not a random sample of either; part of the level difference "
+                "reflects shorter women's seasons, which the recency and severity "
+                "comparisons do not."
             ),
         },
         {

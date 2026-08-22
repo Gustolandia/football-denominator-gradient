@@ -346,7 +346,7 @@ def test_figure_manifest_records_what_was_drawn(load_src_module):
     gradients = _gradient_table()
     manifest = module.figure_manifest(gradients).set_index("figure")
 
-    assert len(manifest) == 6
+    assert len(manifest) == 8
     assert manifest["formats"].eq("png+pdf").all()
     drawn = manifest.loc["J2_jsams_denominator_gradient", "league_labels"]
     assert drawn == "England, Premier League|Turkey, Süper Lig"
@@ -634,3 +634,209 @@ def test_denominator_gradient_figure_renders(tmp_path, load_src_module):
         module.plot_denominator_gradient(
             _gradients().drop(columns=["gamma_within_starters"]), output
         )
+
+
+def _population_gradients() -> pd.DataFrame:
+    """Two men's leagues and two women's, one of them without lineup data."""
+    return pd.DataFrame(
+        {
+            "population": ["men", "men", "women", "women"],
+            "league": [
+                "England, Premier League",
+                "Türkiye, Süper Lig",
+                "England, FA Women's Super League",
+                "Norway, Toppserien",
+            ],
+            "n_appearances": [84317, 78550, 3924, 3937],
+            "gamma_pooled": [0.303, 0.291, 0.264, 0.248],
+            "gamma_pooled_ci_low": [0.290, 0.276, 0.240, 0.222],
+            "gamma_pooled_ci_high": [0.316, 0.306, 0.288, 0.274],
+            "gamma_within_starters": [0.021, 0.018, 0.026, float("nan")],
+            "gamma_within_starters_ci_low": [0.014, 0.010, 0.011, float("nan")],
+            "gamma_within_starters_ci_high": [0.028, 0.026, 0.041, float("nan")],
+        }
+    )
+
+
+def test_population_figure_renders_both_populations(tmp_path, load_src_module):
+    """The men-and-women panel is what separates 'squads are rotated' from
+    'men's football is recorded this way', so it has to draw both populations
+    on one axis and mark the leagues whose source has no lineup box."""
+    module = load_src_module("35_plot_jsams_revision.py")
+    output = tmp_path / "population.png"
+    module.plot_gradient_by_population(_population_gradients(), output)
+    assert output.exists() and output.stat().st_size > 0
+
+    with pytest.raises(KeyError, match="population gradient missing columns"):
+        module.plot_gradient_by_population(
+            _population_gradients().drop(columns=["population"]), output
+        )
+
+
+def test_the_dagger_is_explained_only_when_something_carries_one(tmp_path, load_src_module):
+    """A panel whose sources all published their lineups should not advertise
+    a caveat it has no instance of."""
+    module = load_src_module("35_plot_jsams_revision.py")
+    complete = _population_gradients()
+    complete.loc[3, ["gamma_within_starters", "gamma_within_starters_ci_low",
+                     "gamma_within_starters_ci_high"]] = [0.031, 0.019, 0.043]
+    output = tmp_path / "no_dagger.png"
+    module.plot_gradient_by_population(complete, output)
+    assert output.exists() and output.stat().st_size > 0
+
+
+def test_manifest_gains_a_row_only_when_the_population_figure_is_drawn(load_src_module):
+    """The women's extension must not silently change what the existing
+    manifest claims, because the manuscript gates read it."""
+    module = load_src_module("35_plot_jsams_revision.py")
+    assert len(module.figure_manifest(_gradient_table())) == 8
+
+    extended = module.figure_manifest(_gradient_table(), _population_gradients())
+    assert len(extended) == 9
+    row = extended.set_index("figure").loc["J7_jsams_gradient_by_population"]
+    assert row["league_labels"].startswith("men:England, Premier League|")
+    assert "women:Norway, Toppserien" in row["league_labels"]
+    assert len(row["source_digest"]) == 64
+
+    # The digest has to move when a plotted number moves.
+    moved = _population_gradients()
+    moved.loc[2, "gamma_pooled"] = 0.265
+    other = module.figure_manifest(_gradient_table(), moved).set_index("figure")
+    assert other.loc["J7_jsams_gradient_by_population", "source_digest"] != row["source_digest"]
+
+    with pytest.raises(KeyError, match="population gradients missing columns"):
+        module.figure_manifest(_gradient_table(), pd.DataFrame({"other": [1]}))
+
+
+def test_the_exception_leagues_are_named_in_the_legend(tmp_path, load_src_module):
+    """The two leagues where restriction does not remove the gradient are the
+    paper's most qualified finding. A figure that draws them like the other
+    thirteen makes the reader take the exception on trust, so the panel names
+    them."""
+    module = load_src_module("35_plot_jsams_revision.py")
+    frame = _population_gradients()
+    # Push one league's within-starter bound above the threshold.
+    frame.loc[2, "gamma_within_starters_ci_high"] = 0.058
+    output = tmp_path / "exception.png"
+    module.plot_gradient_by_population(frame, output)
+    assert output.exists() and output.stat().st_size > 0
+
+
+def _calibration_table():
+    return pd.DataFrame(
+        {
+            "stratum": ["all", "starting_lineup", "substitute_list"],
+            "quantity": [
+                "gamma_log_minutes_on_exposure",
+                "gamma_within_starting_lineup",
+                "gamma_within_substitute_list",
+            ],
+            "gamma_predicted_attenuation": [0.303, 0.011, 0.214],
+            "observed_attenuation": [0.151, 0.012, 0.117],
+            "over_prediction_ratio": [2.01, 0.92, 1.83],
+        }
+    )
+
+
+def _translation_table():
+    return pd.DataFrame(
+        {
+            "gamma": [0.01, 0.05, 0.10, 0.30, 0.50],
+            "naive_percent_understatement": [1.0, 4.9, 9.5, 25.9, 39.3],
+            "calibrated_attenuation": [0.005, 0.025, 0.05, 0.149, 0.249],
+            "calibrated_percent_understatement": [0.5, 2.5, 4.9, 13.9, 22.0],
+            "over_prediction_ratio": [0.96, 1.20, 1.42, 2.00, 2.01],
+            "ratio_is_measured": [True, True, True, True, False],
+        }
+    )
+
+
+def _calibration_curve():
+    """A sweep whose ratio rises with the gradient, as the measured one does."""
+    gamma = [0.001, 0.010, 0.025, 0.080, 0.303]
+    ratio = [0.94, 0.96, 1.06, 1.36, 2.01]
+    attenuation = [g / r for g, r in zip(gamma, ratio)]
+    return pd.DataFrame(
+        {
+            "minute_floor": [82.0, 65.0, 40.0, 20.0, 0.0],
+            "gamma": gamma,
+            "gamma_ci_low": [g * 0.7 for g in gamma],
+            "gamma_ci_high": [g * 1.3 for g in gamma],
+            "over_prediction_ratio": ratio,
+            "observed_attenuation": attenuation,
+            "attenuation_ci_low": [a * 0.6 for a in attenuation],
+            "attenuation_ci_high": [a * 1.4 for a in attenuation],
+        }
+    )
+
+
+def test_calibration_figure_draws_both_panels(tmp_path, load_src_module):
+    """The identity over-predicts by twofold and the paper's advice is built on
+    the quantity it over-predicts, so the discrepancy gets a figure rather than
+    a sentence in a supplement nobody opens."""
+    module = load_src_module("35_plot_jsams_revision.py")
+    output = tmp_path / "calibration.png"
+    module.plot_identity_calibration(
+        _calibration_table(), _translation_table(), _calibration_curve(), output
+    )
+    assert output.exists() and output.stat().st_size > 0
+    assert output.with_suffix(".pdf").exists()
+
+
+def test_calibration_figure_survives_a_grid_without_the_threshold(tmp_path, load_src_module):
+    """The threshold annotation is drawn only when the translation grid
+    contains the threshold, so a grid that does not carry it still renders."""
+    module = load_src_module("35_plot_jsams_revision.py")
+    translation = _translation_table()
+    translation = translation[~translation["gamma"].eq(0.05)]
+    output = tmp_path / "calibration_nothreshold.png"
+    module.plot_identity_calibration(
+        _calibration_table(), translation, _calibration_curve(), output
+    )
+    assert output.exists() and output.stat().st_size > 0
+
+
+def test_calibration_figure_names_the_table_it_cannot_read(tmp_path, load_src_module):
+    module = load_src_module("35_plot_jsams_revision.py")
+    output = tmp_path / "bad.png"
+    with pytest.raises(KeyError, match="identity calibration"):
+        module.plot_identity_calibration(
+            _calibration_table().drop(columns=["over_prediction_ratio"]),
+            _translation_table(),
+            _calibration_curve(),
+            output,
+        )
+    with pytest.raises(KeyError, match="threshold translation"):
+        module.plot_identity_calibration(
+            _calibration_table(), _translation_table().drop(columns=["gamma"]),
+            _calibration_curve(), output,
+        )
+    # The curve is what makes the calibrated line a measurement rather than an
+    # extrapolation, so a figure cannot be drawn without it.
+    with pytest.raises(KeyError, match="calibration curve"):
+        module.plot_identity_calibration(
+            _calibration_table(), _translation_table(),
+            _calibration_curve().drop(columns=["over_prediction_ratio"]), output,
+        )
+
+
+def test_decision_rule_figure_renders_with_its_tallies(tmp_path, load_src_module):
+    """The decision rule is the only thing in the paper a practitioner runs, so
+    it gets drawn rather than described, with the fifteen measured leagues
+    distributed across its branches."""
+    module = load_src_module("35_plot_jsams_revision.py")
+    output = tmp_path / "rule.png"
+    module.plot_decision_rule(
+        {"neutral": 0, "restrict": 13, "per_appearance": 2}, output
+    )
+    assert output.exists() and output.stat().st_size > 0
+    assert output.with_suffix(".pdf").exists()
+
+
+def test_decision_rule_figure_defaults_a_missing_tally_to_zero(tmp_path, load_src_module):
+    """A branch nothing landed in is drawn as zero rather than left blank: an
+    empty box reads as an oversight, and a zero reads as a result."""
+    module = load_src_module("35_plot_jsams_revision.py")
+    output = tmp_path / "rule_partial.png"
+    module.plot_decision_rule({"restrict": 13}, output)
+    assert output.exists() and output.stat().st_size > 0

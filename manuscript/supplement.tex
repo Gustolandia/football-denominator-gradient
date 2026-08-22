@@ -24,7 +24,7 @@
 \doublespacing
 
 \title{Supplementary material for\\
-\large Dividing by playing time removes part of the association it should scale: measuring the denominator gradient in eight European leagues}
+\large Playing time tracks recent exposure in fifteen men's and women's football leagues: the denominator gradient and what it does to per-minute injury rates}
 % The supplement travels to referees, so it blinds the same way the
 % manuscript does: author identity lives only in the separate title page.
 \ifdefined\journalblindcopy
@@ -41,6 +41,14 @@
 \maketitle
 
 This supplement contains the analyses that support, but do not compete with, the main measurement-sensitivity results. Supplementary Data S1 is \path{jsams_revised_hypothesis_register.csv}. It contains 706 unique rows: the 637 legacy exploratory tests plus all 63 exposure-multiverse tests, three temporal slopes, one temporal-heterogeneity test and two conditional estimates. Each row gives its model, contrast, target outcome, denominator, raw value, multiplicity family, adjusted value, analysis timing and estimable status. No analysis was pre-specified or confirmatory.
+
+\section{STROBE checklist}
+
+Table~\ref{tab:supp_strobe} is the completed STROBE checklist for cohort studies \cite{vonelm2007strobe}, read together with the consensus statement on injury-surveillance reporting in football \cite{bahr2020ioc}. It is generated rather than typed. Every row names one or more locations in the manuscript, those locations are looked up in the manuscript source when the table is built, and a row pointing at a heading that has since been renamed or cut stops the build instead of reaching a reader as a false statement. The resolution is deposited alongside the table, so the checking can be inspected rather than taken on trust.
+
+Two entries are worth reading as substantive rather than procedural. Item~12d has no analogue here: the design follows appearances, not individuals through follow-up, so there is no loss to follow-up to address, and the checklist says so instead of leaving the row blank. Item~3 records that no hypothesis was prespecified; the manuscript states this in the same words, and the reference association is labelled a worked example wherever it appears.
+
+\input{strobe_checklist_table}
 
 \section{Reference estimand and model}
 
@@ -624,14 +632,8 @@ The 900-minute run-in is an analyst choice. Refitting the same model at 450 minu
 
 Two designs test whether the outcome tracks match load or reporting behaviour \cite{lipsitch2010_negative_controls,sanderson2018_negative_control_measurement_error}.
 
-\emph{Negative-control exposure.} Minutes played 31--37 days before the appearance share the player's reporting profile, club and durability. Chronic load four to five weeks back is not causally inert --- the acute:chronic literature assumes the opposite \cite{impellizzeri2020acwr_pitfalls,wang2020acwr_lessons} --- but its contribution to an injury reported today should be far smaller than the recent window's, while its confounding structure is similar. Fitted alone, this placebo window gave 1.147 (1.011--1.301, $\pval=0.033$). With both windows in the same model, the recent window was 1.249 (1.094--1.425, $\pval<0.001$) and the placebo window 1.118 (0.985--1.270, $\pval=0.085$; Fig.~\ref{fig:supp_negative_control}). The mutually adjusted comparison is the informative one \cite{madley_dowd2020_negative_control_mutual_adjustment}: a placebo association as large as the recent-window association would indicate persistent player-level reporting propensity rather than recent load. The two windows correlate only weakly (Pearson r=0.131, Spearman 0.123), so the mutual adjustment had little collinearity to separate and the contrast between them is interpretable. The placebo association is not zero, so some propensity is present; it does not survive adjustment, while the recent window does.
+\emph{Negative-control exposure.} Minutes played 31--37 days before the appearance share the player's reporting profile, club and durability. Chronic load four to five weeks back is not causally inert --- the acute:chronic literature assumes the opposite \cite{impellizzeri2020acwr_pitfalls,wang2020acwr_lessons} --- but its contribution to an injury reported today should be far smaller than the recent window's, while its confounding structure is similar. Fitted alone, this placebo window gave 1.147 (1.011--1.301, $\pval=0.033$). With both windows in the same model, the recent window was 1.249 (1.094--1.425, $\pval<0.001$) and the placebo window 1.118 (0.985--1.270, $\pval=0.085$; Figure 3 of the main paper). The mutually adjusted comparison is the informative one \cite{madley_dowd2020_negative_control_mutual_adjustment}: a placebo association as large as the recent-window association would indicate persistent player-level reporting propensity rather than recent load. The two windows correlate only weakly (Pearson r=0.131, Spearman 0.123), so the mutual adjustment had little collinearity to separate and the contrast between them is interpretable. The placebo association is not zero, so some propensity is present; it does not survive adjustment, while the recent window does.
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.78\textwidth]{figures/J5_jsams_negative_control_exposure.png}
-\caption{Negative-control exposure. Minutes played 31--37 days earlier, fitted alone and mutually adjusted with the recent seven-day window. The recent window survives conditioning on the placebo window; the placebo window does not survive the reverse.}
-\label{fig:supp_negative_control}
-\end{figure}
 
 \emph{Negative-control outcome.} We pre-specified same-day illness reports, which recent match minutes cannot plausibly cause. The eligible panel contained one such report, so no model was fitted and the check is reported as not estimable rather than as a null result. That scarcity reflects the design rather than the source: illness is recorded across all reconciled episodes at 4.8\% (Table~\ref{tab:supp_episode_types}), but it withdraws a player from the squad instead of ending a match he has started, so a same-day design cannot observe it. As a partial substitute we compared outcome definitions: same-day muscle/tendon reports gave 1.375 (1.134--1.666, raw $\pval=0.001$) and reports with at least 28 recorded absence days 1.219 (1.026--1.447, raw $\pval=0.024$), against 1.267 for any same-day report. Within the nine-test outcome-quality family none reached the Holm threshold (minimum adjusted $\pval=0.061$), so the ordering is suggestive rather than a finding.
 
@@ -712,6 +714,210 @@ In the eight leagues measured here the rule returns the same verdict in every on
 
 The reference cohort gives $\gamma = 0.303$ (0.283--0.323); the same league measured with the diagnostic gives 0.472 (0.447--0.496). Three differences explain the gap, and none of them is a disagreement. The cross-league fits use every domestic-league appearance rather than the established-player cohort, so they include players whose minutes vary most. They construct the exposure from domestic-league appearances alone rather than from all competitions. And they omit the prior-history term, which absorbs part of the between-player variation in playing time. The diagnostic is therefore the more alarming of the two, and it is the one a reader would compute; treating it as an upper reading of the same quantity is the correct interpretation.
 
+\begin{table}[h]
+\centering
+\caption{The denominator gradient in eight men's European domestic leagues, 1 July 2017 to 7 April 2025. Every value is fitted from appearance records alone --- player identifier, date and recorded minutes --- with no injury data of any kind. Intervals are player-clustered. The unadjusted column drops the weekly and half-weekly calendar terms and is what the four lines above return; it differs from the adjusted fit by at most 0.056. These gradients use all domestic-league appearances without the eligibility restriction or history term applied to the reference cohort, and so exceed the 0.303 reported there.}
+\label{tab:supp_leagues_men}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrlrl}
+\toprule
+ & & & \multicolumn{3}{c}{Denominator gradient $\gamma$}\\
+\cmidrule(l){4-6}
+League & Appearances & Players & Pooled (95\% CI) & Unadj. & Within starters (95\% CI)\\
+\midrule
+England, Premier League & 84,317 & 1,580 & 0.472 (0.447--0.496) & 0.453 & 0.020 (0.017--0.023)\\
+Spain, LaLiga & 87,708 & 1,730 & 0.431 (0.409--0.452) & 0.412 & 0.026 (0.023--0.030)\\
+Italy, Serie A & 88,655 & 1,769 & 0.474 (0.452--0.496) & 0.449 & 0.030 (0.026--0.034)\\
+Germany, Bundesliga & 71,036 & 1,481 & 0.581 (0.553--0.610) & 0.525 & 0.029 (0.025--0.033)\\
+France, Ligue 1 & 80,094 & 1,881 & 0.490 (0.467--0.514) & 0.485 & 0.025 (0.021--0.029)\\
+Netherlands, Eredivisie & 67,084 & 1,762 & 0.601 (0.574--0.629) & 0.569 & 0.024 (0.020--0.027)\\
+Portugal, Liga Portugal & 71,043 & 2,002 & 0.655 (0.627--0.683) & 0.623 & 0.031 (0.027--0.035)\\
+Turkey, Süper Lig & 78,550 & 2,044 & 0.620 (0.593--0.647) & 0.588 & 0.026 (0.022--0.030)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{figures/J2_jsams_denominator_gradient.png}
+\caption{The denominator gradient across the eight men's leagues, fitted from appearance records alone. Panel A gives $\gamma$ with player-clustered 95\% intervals, pooled and within starters, against the negligible threshold of 0.05. Panel B gives the interquartile range of recorded minutes in the same two populations and supplies the reason: an offset can only carry a gradient to the extent that it varies, and starters have almost no minutes to vary over.}
+\label{fig:supp_gradient_men}
+\end{figure}
+
+\section{The gradient in women's leagues}
+
+The men's panel comes from one provider and one sex, so on its own it cannot distinguish a property of squad rotation from a property of men's football or of one database. Women's competitions differ in country, squad size, fixture calendar, season geometry, sex and data provider simultaneously, which makes them the sharpest available test.
+
+Women's appearances were read from Soccerdonna match reports, which publish each starting eleven and every substitution with its minute. Recorded minutes were therefore reconstructed rather than read: a starter plays until she is replaced, a substitute from the minute she enters, and a dismissal ends the appearance where it occurred. The reconstruction is checked on every match against the identity that twenty-two starters times ninety minutes totals 1980 recorded minutes, and a match failing that check is excluded rather than repaired. A league-season entered the panel only where the parsed reports covered at least 90\% of the league's own published fixture list.
+
+\begin{table}[h]
+\centering
+\caption{The denominator gradient in seven women's European first tiers, one season each between 9 August 2024 and 16 November 2025. Fitted exactly as the men's gradients are, from appearance records alone with no injury data. Intervals are player-clustered. Coverage is the share of the league's published fixture list that produced a usable match report. The two rows whose within-starter interval reaches past the negligible threshold of 0.05 are the two where the decision rule returns risk per appearance rather than restriction to starters.}
+\label{tab:supp_leagues_women}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrll}
+\toprule
+League & Appearances & Players & Coverage & Pooled $\gamma$ (95\% CI) & Within starters (95\% CI)\\
+\midrule
+England, FA Women's Super League & 3,924 & 297 & 132/132 & 0.466 (0.401--0.532) & 0.033 (0.019--0.047)\\
+Germany, Frauen-Bundesliga & 3,999 & 304 & 132/132 & 0.456 (0.385--0.527) & 0.027 (0.010--0.043)\\
+Spain, Primera División Femenina & 7,269 & 412 & 239/240 & 0.477 (0.420--0.535) & 0.038 (0.027--0.050)\\
+Italy, Serie A Femminile & 2,737 & 245 & 90/90 & 0.494 (0.402--0.585) & 0.030 (0.011--0.049)\\
+Norway, Toppserien & 3,937 & 247 & 135/135 & 0.444 (0.371--0.516) & 0.029 (0.018--0.041)\\
+Sweden, Damallsvenskan & 5,278 & 345 & 181/182 & 0.647 (0.561--0.733) & 0.045 (0.032--0.058)\\
+Switzerland, Women's Super League & 2,655 & 254 & 89/90 & 0.465 (0.383--0.547) & 0.027 (0.009--0.045)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Three of the 1001 scheduled fixtures did not produce a usable match report, two to transient server errors and one to a report carrying only one lineup. All seven league-seasons cleared the coverage threshold, and every retained match satisfied the minute identity exactly.
+
+\subsection*{Where the remedy stops working}
+
+In five of the seven women's leagues the within-starter upper bound falls below the negligible threshold and the rule returns restriction to starters, as it does in all eight men's leagues. In Spain the bound reaches 0.050 and in Sweden 0.058, so the rule returns risk per appearance instead. We report this as an observed boundary rather than a finding about those two competitions. Each rests on a single season, the women's intervals are wider than the men's throughout because the panels are an order of magnitude smaller, and a wider interval alone can push an upper bound past a fixed threshold without the point estimate moving. What the exception demonstrates is that the rule discriminates: a remedy recommended everywhere without checking would have been wrong in two of the fifteen leagues measured here.
+
+\section{Two providers, one league}
+
+The women's panel and the men's panel come from different providers, which is a real threat to comparing them rather than a pedantic one. The Frauen-Bundesliga is the one competition covered by both providers used in this study, so the same league-season was fitted twice.
+
+\begin{table}[h]
+\centering
+\caption{The Frauen-Bundesliga gradient fitted from two independent providers over the same season. Both fits use the same model, the same exposure window and the same player-clustered covariance; only the source of the appearance records differs.}
+\label{tab:supp_cross_source}
+\small
+\begin{tabular}{lrl}
+\toprule
+Provider & Appearances & Pooled $\gamma$ (95\% CI)\\
+\midrule
+Soccerdonna match reports & 3,999 & 0.456 (0.385--0.527)\\
+FBref match reports & 4,067 & 0.509 (0.429--0.588)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The two differ by 0.053 with substantially overlapping intervals, and the two providers disagree slightly about how many appearances the season contained, which is itself informative about what a public appearance record is. Neither fit changes the verdict the rule returns. An overlap is not proof that two sources agree, but a non-overlap would have been proof that they do not, and would have made the men-and-women comparison unreportable.
+
+\section{The public injury record in the two populations}
+
+The main text restricts the outcome analysis to men's football and gives numbers rather than an assertion for why. Those numbers come from a matched audit: one sampling frame and one parser applied to the injury histories of current squads at eight women's and four men's clubs, 426 and 107 players respectively.
+
+The audit measures three things, because three different failures would each disqualify the record as an outcome. \emph{Presence} is the share of sampled players carrying any recorded spell: 66.2\% against 86.0\%. \emph{Depth} is how far the record reaches back, measured per capita as the number of sampled players with a spell recorded in 2019--20 against the number with one recorded in 2024--25: 0.07 against 0.43. Because that comparison is made within the same players over time, it describes the recording rather than the injuries, and it is the finding that rules out a multi-season women's window. \emph{Severity mix} is the share of recorded spell descriptions naming a cruciate ligament injury: 9.9\% against 1.2\%. Nobody believes cruciate ruptures outnumber hamstring strains by that margin in either population, so the excess is a property of which injuries get reported.
+
+Two cautions about the audit itself. Current squads are not a random sample of either population, although the frame is identical for both, so the comparison is fairer than either number alone. And part of the difference in spells per player follows from shorter women's seasons: a 22-match league produces fewer opportunities for injury than a 38-match one. That explanation does not touch the depth or severity comparisons, which is why those two carry the argument.
+
+\section{Calibrating the identity, and what the threshold costs}
+
+The first-order identity over-predicts the attenuation, and the size of the over-prediction is itself a function of the gradient. This section measures that function, and then translates a gradient into the quantity a reader actually reports.
+
+The measurement comes first, because it is what the threshold is read against. Raising a floor on recorded minutes removes the short appearances, which is where most of the minute variation lives, so the gradient falls; the outcome, the exposure, the covariates and the clustering are unchanged. Table~\ref{tab:supp_curve} sweeps that floor across the whole range of the gradient, with a 95\% interval on each ratio from 1000 player resamples in which the entire sweep is recomputed. The unrestricted row reproduces both published quantities exactly, and the generator stops if it does not. An earlier version of this analysis had no sweep and filled the gap between the squad-role strata with the pooled ratio of 2.01, which is an extrapolation into the only part of the range the decision rule reads, and it ran in the direction that makes the threshold look about twice as tolerant as it is.
+
+\begin{table}[h]
+\centering
+\caption{The over-prediction ratio measured across the range of the gradient. Each row restricts the cohort to appearances at or above a recorded-minute floor; nothing else about the model changes. Strata whose gradient interval includes zero are dropped, because a ratio of two quantities indistinguishable from zero is not a calibration. The final column is the percentile interval of the ratio over 1000 player resamples; it widens as the floor rises because fewer events survive. The floor-zero row is the published cohort.}
+\label{tab:supp_curve}
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{rrrrrrl}
+\toprule
+Minute floor & Appearances & Events & $\gamma$ & Attenuation & Ratio & Ratio 95\% CI\\
+\midrule
+82 & 54,670 & 89 & 0.001 & 0.001 & 0.94 & 0.46 to 4.20\\
+75 & 58,920 & 124 & 0.004 & 0.004 & 0.96 & 0.80 to 1.23\\
+65 & 64,341 & 183 & 0.009 & 0.010 & 0.96 & 0.87 to 1.06\\
+55 & 67,932 & 238 & 0.015 & 0.016 & 0.97 & 0.91 to 1.04\\
+40 & 71,460 & 376 & 0.024 & 0.023 & 1.06 & 1.00 to 1.12\\
+20 & 78,108 & 496 & 0.078 & 0.057 & 1.36 & 1.29 to 1.43\\
+0 & 88,573 & 576 & 0.303 & 0.151 & 2.01 & 1.92 to 2.12\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The ratio's point estimates rise monotonically, from 0.94 where the gradient is 0.001 to 2.01 where it is 0.303. The intervals temper what may be said about the small-gradient end: the point estimates sit within a few per cent of one there, and between $\gamma=0.004$ and $\gamma=0.024$ the intervals bear that out, with upper bounds no higher than 1.23; the very smallest floor, with 89 events, is too noisy to constrain the ratio at all (0.46 to 4.20), and is reported rather than leaned on. The region the threshold actually needs is well determined: at $\gamma=0.05$ the interval is 1.15 to 1.28. The factor of two is a large-gradient phenomenon, and the placebo exposure of a later section is consistent: it returns 1.99 at $\gamma=0.201$, against 1.36 (1.29 to 1.43) measured here at $\gamma=0.078$ and 2.01 (1.92 to 2.12) at $\gamma=0.303$.
+
+Two scope notes. The curve is measured in this cohort, and the ratio is a property of the joint distribution of minutes, exposure and events rather than of $\gamma$ alone, so an analyst should sweep their own data rather than borrow these values; the sweep reuses the outcome model already being fitted, plus one least-squares fit per floor. That also marks its limit: unlike the gradient, the calibration needs an outcome, which is why it is reported for the reference cohort only --- the women's panels carry no injury data, so no second-population sweep is possible here.
+
+Table~\ref{tab:supp_calibration} shows where the sweep came from: the four squad-role strata pair a gradient with the attenuation observed in the same rows, and the identity holds only within starters, where the gradient is small. The expansion weights every appearance equally while the Poisson score weights by fitted means, so the attenuation follows the minutes--exposure gradient among event-bearing rows rather than across the whole panel. Four strata leave a gap between $\gamma=0.011$ and $\gamma=0.214$ with the reporting threshold inside it, which is why the sweep exists.
+
+\begin{table}[h]
+\centering
+\caption{The attenuation the first-order identity predicts against the attenuation observed, by squad-role stratum. The identity predicts an attenuation equal to $\gamma$. The final two columns express both as the percentage of the reported ratio that a recorded-minute denominator divides away, which is $1-\exp(-a)$ for an attenuation $a$.}
+\label{tab:supp_calibration}
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lrrrrr}
+\toprule
+Stratum & $\gamma$ (predicted) & Observed & Ratio & Predicted \% & Observed \%\\
+\midrule
+All appearances & 0.303 & 0.151 & 2.01 & 26.2 & 14.0\\
+Starters & 0.011 & 0.012 & 0.89 & 1.1 & 1.2\\
+Substitutes & 0.214 & 0.117 & 1.84 & 19.3 & 11.0\\
+Lineup unknown & 0.351 & 0.181 & 1.95 & 29.6 & 16.5\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The consequence for the reporting threshold is Table~\ref{tab:supp_threshold}. At $\gamma=0.05$ the measured ratio is 1.20 (1.15 to 1.28), so the threshold costs 4.1\% of the reported rate ratio, with a resampled interval of 3.8\% to 4.3\%: close to the 4.9\% the identity alone implies, and nothing like the 2.5\% a pooled ratio of 2.01 would have given. An analyst who wants the threshold to mean "no more than 5\% of my answer" should set it near 0.06. We keep 0.05, which is now shown to be a slightly conservative choice rather than the substantially over-conservative one the pooled calibration made it appear, and we report the translation so that the choice is visible and a different tolerance can be substituted.
+
+\begin{table}[h]
+\centering
+\caption{What a gradient costs the reported rate ratio. The naive column reads the identity at face value; the calibrated column divides by the ratio measured at that gradient in Table~\ref{tab:supp_curve}. The final row lies beyond the swept range and its ratio is extrapolated, which is marked rather than hidden. The row in bold is the reporting threshold used throughout.}
+\label{tab:supp_threshold}
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{rrrrl}
+\toprule
+$\gamma$ & Ratio at this $\gamma$ & Naive \% & Calibrated \% & Ratio source\\
+\midrule
+0.010 & 0.96 & 1.0 & 1.0 & measured\\
+0.025 & 1.07 & 2.5 & 2.3 & measured\\
+\textbf{0.050} & \textbf{1.20} & \textbf{4.9} & \textbf{4.1} & measured\\
+0.100 & 1.42 & 9.5 & 6.8 & measured\\
+0.200 & 1.71 & 18.1 & 11.0 & measured\\
+0.300 & 2.00 & 25.9 & 13.9 & measured\\
+0.500 & 2.01 & 39.3 & 22.0 & extrapolated\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Ascertainment across squad roles}
+
+The remedy this paper recommends restricts the analysis to starters, so it is worth asking whether the public record observes starters and substitutes equally. It does not observe them equally per appearance: a same-day report attaches to 6.7 per 1000 starter appearances against 2.0 per 1000 substitute appearances (Wilson intervals 6.1--7.5 and 1.3--2.9), a ratio of 3.46.
+
+That gap is exposure, not reporting. A starter records a mean of 84.9 minutes and a substitute 20.0, and per 1000 recorded minutes the ordering inverts: 0.079 among starters against 0.097 among substitutes, a ratio of 0.82. If the record were systematically missing substitutes' events --- a plausible worry, since a player withdrawn after twenty minutes attracts less coverage than one carried off after seventy --- the per-minute rate among substitutes would be the lower of the two. It is the higher. Rows with no lineup status sit above both, at 8.8 per 1000 appearances and 0.130 per 1000 minutes. We do not offer an explanation for that: thin lineup coverage would account for the missing status but not for a higher event rate, and we have no way to separate the possibilities with these data.
+
+This does not prove that reporting is unbiased; it rules out the specific direction that would make restriction to starters self-defeating. A misclassification acting equally on both roles would be invisible to this comparison, and is admitted as such in the main text.
+
+\section{Clustering the covariance three ways}
+
+Every interval in this paper is clustered on player identifier, because appearances repeat within player. They also repeat within club-season, and squad rotation is a club decision rather than a player one, and they repeat within fixture. Table~\ref{tab:supp_clustering} refits the reference gradient under each.
+
+Nothing about the estimate can move, and nothing does: clustering is a choice of covariance, not of estimator, so the three rows carry an identical gradient. The generator checks this rather than assuming it, and stops the run if the baseline row fails to reproduce the published value --- a first attempt at this table silently dropped the history term the published model conditions on and returned 0.321, which would have been reported as a clustering effect when it was a different model.
+
+\begin{table}[h]
+\centering
+\caption{The reference gradient under three clusterings. The estimate is identical by construction; only the interval moves. Fixture clustering gives the narrowest interval because a fixture contains at most twenty-two of the cohort's appearances, and club-season the widest because a club-season contains hundreds.}
+\label{tab:supp_clustering}
+\footnotesize
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lrrrl}
+\toprule
+Clustering & Groups & $\gamma$ & Std.\ error & 95\% CI\\
+\midrule
+Player (published) & 1,208 & 0.303 & 0.0101 & 0.283 to 0.323\\
+Club-season & 201 & 0.303 & 0.0108 & 0.282 to 0.324\\
+Fixture & 6,902 & 0.303 & 0.0062 & 0.291 to 0.315\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The widest interval is 1.74 times the narrowest, and every lower bound sits above 0.28. The published clustering is neither the most nor the least conservative of the three, and no verdict in this paper changes under any of them. Fixture is arguably the wrong level: a fixture contains two clubs whose rotation decisions are made independently, so clustering there groups appearances that share a date rather than a decision. We report it because it is the narrowest of the three and therefore the least favourable to a claim of robustness, not because we think it is the correct unit.
+
+\section{The precision the panels delivered}
+
+No target sample size was set, because the panel is every admitted appearance in the selected competitions rather than a recruited sample. The honest substitute for a power statement is the precision actually achieved. Across the eight men's leagues the half-width of the pooled gradient's interval ran from 0.022 to 0.029, between 4.2\% and 5.1\% of the estimate. Across the seven women's leagues, which are one season each and between ten and thirty times smaller, it ran from 0.057 to 0.092, between 12.0\% and 18.5\% of the estimate. The least precise panel is Italy's Serie A Femminile at 2,737 appearances, whose interval is 0.402 to 0.585: wide, and still an order of magnitude clear of the 0.05 threshold. Every pooled verdict in this paper is therefore carried by an interval that does not come close to the threshold it is read against. The within-starter verdicts are the tighter question, and the two leagues where they fall the other way are reported as such in the main text.
+
 \section{The identity replicated on a placebo exposure}
 
 The first-order identity predicts an attenuation of $\gamma$ and delivers about half of it, because the expansion weights appearances equally whereas the Poisson score weights by fitted means. If that ratio were a property of the seven-day exposure it would be a coincidence worth worrying about. It is not.
@@ -762,7 +968,7 @@ The central revised files share the prefix \path{jsams_revised_}:
 \endgroup
 The opportunity-resolution audit is \path{selection_membership_resolution_audit.csv}. Three hand-built files no script can regenerate are preserved under \path{data/manual/}: \path{independent_same_day_event_audit.csv}, the exposure-blinded same-day outcome audit; \path{independent_non_event_audit.csv}, the report-free queue review with its per-record notes; and \path{per_minute_denominator_scoping.csv}, the scoping records with the verbatim sentence behind every confirmed denominator. Daily models, crude plots, FFT diagnostics and earlier category analyses remain in the versioned archive but are not main-paper evidence.
 
-Analyses used Python 3.12.10 with pandas 2.3.3, numpy 2.3.5, statsmodels 0.14.5, patsy 1.0.2, scipy 1.16.3 and matplotlib for figures. Script \path{src/36_jsams_second_referee_analysis.py} fits every model and writes 50 \path{jsams_revised_*} tables under a fixed random seed; \path{src/37_denominator_gradient.py} writes a further nine, including the cross-league gradients, the decision rule, the estimator and floor sensitivities, the specification register and both deposited protocols; \path{src/35_plot_jsams_revision.py} reads those tables and writes six figures --- two shown in the main paper and four here --- without refitting anything.
+Analyses used Python 3.12.10 with pandas 2.3.3, numpy 2.3.5, statsmodels 0.14.5, patsy 1.0.2, scipy 1.16.3 and matplotlib for figures. Script \path{src/36_jsams_second_referee_analysis.py} fits every model and writes 50 \path{jsams_revised_*} tables under a fixed random seed; \path{src/37_denominator_gradient.py} writes a further nine, including the cross-league gradients, the decision rule, the estimator and floor sensitivities, the specification register and both deposited protocols. The women's panel is assembled by \path{src/39_fetch_fbref_womens_appearances.py}, which validates every match report before admitting it and replaces source player identifiers with surrogates drawn at random; \path{src/40_womens_denominator_gradient.py} fits the women's gradients by calling script 37's estimator unchanged, so a difference between the populations cannot come from two versions of one regression; and \path{src/41_womens_injury_record_audit.py} turns the injury-record audit into the aggregates reported here, none of which name anybody. Script \path{src/42_statistical_output_appendix.py} refits all 30 reported gradients, checks each against the deposited estimate and stops on any mismatch, then writes the full statistical output supplied as Appendix A. Script \path{src/35_plot_jsams_revision.py} reads the deposited tables and writes nine figures --- five shown in the main paper and four here --- without refitting anything. Script \path{src/44_referee_response_analysis.py} computes the quantities added in revision: the calibration of the first-order identity against the attenuation actually observed, the translation of a gradient into the percentage of the association it removes, the ascertainment comparison across squad roles, the clustering sensitivity, and the precision each league panel delivered. Script \path{src/43_strobe_checklist.py} generates the STROBE checklist in Section~1, resolving each item against the manuscript source and stopping rather than emitting an item that points at text the manuscript does not contain.
 
 \begingroup
 \footnotesize

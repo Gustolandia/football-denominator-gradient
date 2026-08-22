@@ -1,6 +1,6 @@
-% Cover letter for the JSAMS submission. The prose is kept in step with
-% manuscript/cover_letter.md; the counts it states are enforced against
-% manuscript.tex by tests/test_manuscript_tier_visibility.py.
+% Cover letter for the Science and Medicine in Football submission. The prose
+% is kept in step with manuscript/cover_letter.md. No count is hard-coded
+% here: a stated number goes stale with the next edit, and once did.
 \documentclass[11pt]{article}
 
 \usepackage[margin=1in]{geometry}
@@ -14,83 +14,68 @@
 
 \begin{document}
 
-To the Editor-in-Chief, \emph{Journal of Science and Medicine in Sport}
+To the Editor-in-Chief, \emph{Science and Medicine in Football}
 
 Dear Editor,
 
-Please consider our manuscript, \emph{``Dividing by playing time removes part
-of the association it should scale: measuring the denominator gradient in
-eight European leagues''}, for publication as Original Research.
+Please consider our manuscript, \emph{``Playing time tracks recent exposure in
+fifteen men's and women's football leagues: the denominator gradient and what
+it does to per-minute injury rates''}, as an Original Investigation.
 
-Category: Original Research. Sub-discipline: Sport Injury (injury
-epidemiology). This research did not receive any specific grant from funding
-agencies in the public, commercial, or not-for-profit sectors, and there is no
-external financial support, equipment or product involvement to declare. The
-manuscript is available on the arXiv preprint server as arXiv:2608.11228
-(\url{https://arxiv.org/abs/2608.11228}). In line with the journal's preprint
-policy, a note will be added to the preprint recording that the manuscript is
-under peer review once it is sent for review, and updated again on any
-publication decision.
+\textbf{What the paper shows.} Football injury incidence is conventionally
+reported per 1000 hours of exposure. We show that the denominator of that rate
+is not neutral: recorded minutes rise and fall with the workload under study,
+so the division removes part of the association it is meant to scale. In our
+reference cohort it removed two thirds of the excess association, moving a rate
+ratio of 1.27 to 1.09 with nothing in the model output to show for it.
 
-\textbf{Why this journal}
+\textbf{Why this journal.} The readership of \emph{Science and Medicine in
+Football} is the readership that computes this rate, and the journal's stated
+mission covers methodological approaches as well as practice. The evidence is
+multi-league and multi-sex rather than single-club: fifteen European first
+tiers, 658,286 appearances, eight men's competitions across eight seasons and
+seven women's competitions from two independent data providers.
 
-This paper completes an argument this journal began. Shrier and colleagues
-showed analytically in the \emph{Journal of Science and Medicine in Sport}
-(2022) that when a risk factor changes workload, entering workload ---
-including time at risk --- in the regression causes bias. Hoenig and
-colleagues, also in this journal (2022), established that the numerator of
-public football injury data cannot carry epidemiological weight. What neither
-paper could say is how large the denominator's version of the problem is,
-where it bites, and how a reader would detect it before dividing. We measure
-it: the denominator gradient --- the slope of log recorded minutes on the
-exposure --- separates outcome truncation (vivid, and negligible in aggregate)
-from exposure-dependent playing time (invisible per row, and decisive), and
-replicates without exception across 628,487 appearances in eight European
-leagues. The check requires appearance records only --- no injury data --- so
-it can be run in any league, before any per-minute rate is computed. We
-believe the journal that published the analytical claim is the right home for
-its empirical measurement.
+\textbf{This is not descriptive match analytics.} It is a measurement-validity
+study for injury surveillance, and its output is a check a practitioner can run
+on data they already hold before any model is fitted. The check needs an
+appearance table only --- player identifier, date, recorded minutes --- and no
+injury data of any kind.
 
-\textbf{Ethics and data protection}
+\textbf{Sex and gender.} Results are measured and reported separately for men's
+and women's competitions, and neither population is pooled into the other. The
+outcome analysis is confined to men's football, and the manuscript gives
+measured reasons rather than an assertion: a matched audit of the two public
+injury records, applying one sampling frame and one parser to both, is reported
+in Table 3. We would rather withhold a women's incidence analysis than publish
+one that describes the recording regime instead of the players.
 
-The study reused exclusively public, pre-existing records, with no
-recruitment, contact, intervention or private medical information. Trinity
-College Dublin guidance does not permit retrospective approval of secondary
-public-data research; no determination was obtained before the analysis began
-and none can now be issued, and the manuscript states this plainly rather than
-implying an approval that does not exist. Because the records concern
-identifiable professional athletes and absence labels are health-related, the
-manuscript also states the data-protection basis: processing for scientific
-research under the research provisions of the General Data Protection
-Regulation, restricted to data already published by the source.
+\textbf{Transparency in place of pre-registration.} The study was not
+pre-registered, and the manuscript says so plainly. In compensation, all
+analysis code is public, the data are deposited, the complete original output
+of the statistical software for all thirty reported models is supplied as
+Appendix A, and an automated test suite at 100\% statement and branch coverage
+recomputes every number in the manuscript from the deposited tables and fails
+when text and data disagree.
 
-No deposited file carries a player's name, the data provider's player
-identifier, or a match date. The hand-built audit records are keyed by
-surrogates drawn at random once and held apart from the archive, with dates
-coarsened to seasons; the reviewer's identified copy stays with the authors,
-and row-level model diagnostics are not deposited. We do not describe this as
-anonymisation, because the sampling rule is published and a reader holding the
-data provider's own snapshot could redraw the same appearances. We are happy
-to provide any correspondence with our institution the editorial office may
-require, and to discuss the de-identification with the editorial office if
-that would help.
+\textbf{Preprint.} This work is available on arXiv as arXiv:2608.11228
+(\url{https://arxiv.org/abs/2608.11228}). We understand from your instructions
+that prior posting does not preclude consideration and that anonymity cannot be
+guaranteed for a manuscript with a preprint. One point of candour: the version
+posted at the time of writing (v2) predates the fifteen-league extension and
+states that the within-starter pattern held without exception. This manuscript
+supersedes that claim --- the restriction fails in Spain and Sweden --- and a
+replacement will be posted as a new version of the same record at submission,
+so that no reader has to reconcile two versions on their own.
 
-\textbf{Reproducibility}
-
-Every number in the manuscript and supplement is regenerated from committed
-data by archived code, enforced by an automated test suite at 100\% statement
-and branch coverage that fails whenever text and data disagree. The frozen
-code, data and manuscript are archived together as a single record on Zenodo
-and cited in the data-availability statement.
-
-The manuscript is within the journal's 5,000-word limit, with a 249-word
-structured abstract, five Practical Implications bullets, two figures and
-three tables; the exact counts are stated on the title page and are enforced
-against the manuscript by the archived test suite. It is not under
-consideration elsewhere, and all authors have approved the submission. The
-anonymised, line-numbered review copy, the anonymised supplement and the
-separate title page are uploaded per the journal's anonymised review process;
-the anonymised files carry neither author names nor the institution's.
+\textbf{Declarations.} The research received no specific grant from any funding
+agency in the public, commercial, or not-for-profit sectors. The authors report
+there are no competing interests to declare. Generative AI use is declared in
+the manuscript. The work is original, is not under consideration elsewhere, and
+all authors have read and approved the submitted version. The manuscript is
+within the 4,500-word Original Investigation limit, with an unstructured
+abstract inside the 250-word limit, and reporting follows STROBE with the
+completed checklist supplied.
 
 Yours sincerely,
 

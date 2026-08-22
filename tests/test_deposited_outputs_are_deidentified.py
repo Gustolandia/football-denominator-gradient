@@ -205,3 +205,55 @@ def test_the_identity_map_never_travels():
         for path in tree.rglob("*"):
             assert "identity_map" not in path.name, path
             assert "player_map" not in path.name, path
+
+
+# The women's appearance panel. It is deposited, but it sits outside
+# DEPOSITED_TREES and is gzipped, so the sweeps above never opened it: it is a
+# .csv.gz in data/processed rather than a .csv in data/processed/results. The
+# largest per-person table in the deposit was therefore the one table nothing
+# checked, which is exactly the shape of the last disclosure.
+WOMENS_PANEL = ROOT / "data" / "processed" / "womens_appearances.csv.gz"
+
+#: Surrogates are drawn, never derived: a "W" and twelve hex characters from
+#: secrets.token_hex. A source identifier is decimal, so the two cannot be
+#: confused by eye or by this pattern.
+WOMENS_SURROGATE = re.compile(r"^W[0-9A-F]{12}$")
+
+
+def test_the_womens_panel_is_keyed_by_drawn_surrogates_only():
+    """Every row of the women's panel must be unreadable without the map."""
+    if not WOMENS_PANEL.exists():  # pragma: no cover - panel is built by src/39
+        return
+
+    panel = pd.read_csv(WOMENS_PANEL, dtype=str)
+
+    for column in panel.columns:
+        assert column not in ("player_name", "tm_player_id", "fbref_player_id"), column
+
+    identifiers = panel["player_id"].dropna()
+    assert not identifiers.empty
+    unmatched = sorted(set(identifiers[~identifiers.str.match(WOMENS_SURROGATE)]))
+    assert not unmatched, f"non-surrogate identifiers in the women's panel: {unmatched[:5]}"
+
+    # A decimal identifier would be a source id that survived substitution.
+    assert not identifiers.str.fullmatch(r"\d+").any()
+
+    # The panel carries performance fields only. An injury or diagnosis column
+    # here would make re-identification a health disclosure rather than a
+    # recovery of already-public minutes.
+    for column in panel.columns:
+        lowered = column.lower()
+        for banned in ("injur", "diagnos", "absence", "illness", "medical"):
+            assert banned not in lowered, column
+
+
+def test_the_womens_surrogate_map_stays_private():
+    """The map that reverses those surrogates lives in data/private, which no
+    deposit builder reads. If it ever appears in a deposited tree, the panel
+    above is pseudonymised in name only."""
+    assert (ROOT / "data" / "private" / "womens_player_surrogates.csv").exists()
+    for tree in DEPOSITED_TREES + (ROOT / "data" / "processed",):
+        if not tree.exists():
+            continue
+        for path in tree.rglob("*surrogate*"):
+            assert False, f"a surrogate map reached a deposited tree: {path}"

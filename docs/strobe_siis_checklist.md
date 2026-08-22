@@ -2,8 +2,15 @@
 
 This working checklist maps the current public-data manuscript to reporting
 items likely to matter under STROBE-SIIS and sports-injury-surveillance review.
-It is not a completed journal form. Page and line references must be generated
-after the target journal template is fixed.
+It is not a completed journal form.
+
+**The completed form is elsewhere.** The checklist submitted with the
+manuscript is generated from `data/manual/strobe_checklist.csv` by
+`src/43_strobe_checklist.py` and appears as Section 1 of the supplement. That
+one resolves every item against the manuscript source and fails the build
+rather than name a section the manuscript does not have. This file remains as
+the working notes it always was: it covers the sports-injury-surveillance
+extension items in prose, which the numbered STROBE form has no row for.
 
 ## Design, setting, and ethics
 

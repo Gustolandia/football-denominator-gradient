@@ -1,0 +1,6 @@
+component,tokens,requirement
+design,Retrospective observational cohort study,"The journal requires an unstructured abstract that nonetheless always states the design. A commonly used design term also satisfies STROBE item 1a."
+aims,We aimed to,"The journal requires the aims in the abstract. The same sentence must appear in the Introduction, so the stated aims and the pursued aims cannot diverge."
+conclusion,Recorded minutes are not a neutral denominator|should be reported before any per-minute rate,"The journal requires a conclusion based on the primary outcomes. Either half of the closing sentence satisfies it; both are present."
+population,men's|women's,"Sex must be visible in the abstract, because the paper's claim is explicitly about two populations and the previous submission was rejected for treating one as the default."
+uncertainty,95\% CI,"House rule, not the journal's: no estimate reaches a reader without its interval."

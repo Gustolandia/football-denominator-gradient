@@ -12,9 +12,10 @@
 % The counts below are enforced against the manuscript by
 % tests/test_manuscript_tier_visibility.py, which computes them from
 % manuscript.tex and fails when a stated value drifts from a computed one.
-\newcommand{\papertitle}{Dividing by playing time removes part of the association it should scale: measuring the denominator gradient in eight European leagues}
-\newcommand{\mainwordcount}{3,707}
-\newcommand{\abstractwordcount}{249}
+\newcommand{\papertitle}{Playing time tracks recent exposure in fifteen men's and women's football leagues: the denominator gradient and what it does to per-minute injury rates}
+\newcommand{\mainwordcount}{4,484}
+\newcommand{\abstractwordcount}{248}
+\newcommand{\keywordlist}{injury incidence; exposure; workload; epidemiological methods; women's football; soccer}
 
 \begin{document}
 
@@ -32,6 +33,8 @@ Dublin 2, Ireland.
 $^{b}$ Discipline of Anatomy, School of Medicine, Trinity College Dublin,
 Dublin 2, Ireland.
 
+Affiliations are those at which the research was conducted.
+
 \textbf{Corresponding author}
 
 Gustavo Pedro Ricou, School of Computer Science and Statistics, Trinity
@@ -41,20 +44,34 @@ College Dublin, Dublin 2, Ireland. Email: \href{mailto:pedrorig@tcd.ie}{pedrorig
 
 Nicholas Mahony: \href{mailto:njmahony@tcd.ie}{njmahony@tcd.ie}.
 
+\textbf{ORCID}
+
+Gustavo Pedro Ricou: \url{https://orcid.org/0009-0001-4196-7213}.
+
+\textbf{Keywords}
+
+\keywordlist
+
 \textbf{Manuscript details}
 
-Article type: Original research. Main-text word count: \mainwordcount\
+Article type: Original Investigation. Main-text word count: \mainwordcount\
 (including section headings; excluding abstract, references, tables, figure
-captions and declarations). Abstract word count: \abstractwordcount. Tables: 3. Figures: 2. Supplementary file: 1.
+captions and declarations). Abstract word count: \abstractwordcount\ (unstructured).
+Tables: 3. Figures: 5. Supplementary file: 1. Appendix: 1 (full statistical output).
 Preprint: this work is available on arXiv as arXiv:2608.11228
-(\url{https://arxiv.org/abs/2608.11228}).
+(\url{https://arxiv.org/abs/2608.11228}). The version posted there at the time
+of writing (v2) predates the fifteen-league extension: it reports eight men's
+leagues and states that the within-starter pattern held without exception. This
+manuscript supersedes that claim --- the restriction fails in two of seven
+women's leagues --- and a replacement will be posted as a new version of the
+same record at submission.
 
-\textbf{Author contributions}
+\textbf{Author contributions (CRediT)}
 
-Gustavo Pedro Ricou: conceptualisation, data curation, formal analysis,
-methodology, software, visualisation, writing--original draft, and
-writing--review and editing. Nicholas Mahony: clinical interpretation,
-methodology, and writing--review and editing.
+Gustavo Pedro Ricou: Conceptualization; Data curation; Formal analysis;
+Investigation; Methodology; Software; Validation; Visualization; Writing ---
+original draft; Writing --- review \& editing. Nicholas Mahony: Methodology;
+Writing --- review \& editing.
 
 \textbf{Acknowledgements}
 
@@ -68,22 +85,45 @@ sports-medicine terminology, presentation and interpretation.
 
 \textbf{Funding}
 
-No specific funding or external financial support was received.
+This research received no specific grant from any funding agency in the
+public, commercial, or not-for-profit sectors.
 
-\textbf{Competing interests}
+\textbf{Disclosure of interest}
 
-The authors declare no competing interests.
+The authors report there are no competing interests to declare.
 
-\textbf{Data availability and reproducibility}
+\textbf{Declaration of generative AI use}
 
-This paper, the analysis pipeline that produced every reported number, its
-test suite and the hand-built audit evidence are archived together as a single
-record at \url{https://doi.org/10.5281/zenodo.21940597}. The development
-repository is
-\url{https://github.com/Gustolandia/football-denominator-gradient}, and the
-archives of earlier versions of this work are at
-\url{https://doi.org/10.5281/zenodo.21673177} and
-\url{https://doi.org/10.5281/zenodo.21673210}. The manuscript contains the
-required declaration of generative AI and AI-assisted technologies.
+In accordance with the journal's policy on generative artificial intelligence,
+Anthropic's Claude was used under author direction to assist with
+data-acquisition tooling, analysis code and its verification, literature
+searching, and the drafting and editing of manuscript text. The study design,
+the scientific claims and their interpretation are the authors'. All reported
+quantities are reproducibly computed from the committed data by the archived
+code and were verified by the authors, who take full responsibility for the
+content of this article.
+
+\textbf{Ethics approval and informed consent}
+
+The study reused exclusively public, pre-existing records, with no
+recruitment, contact, intervention or access to private medical records, so no
+primary data were collected from human participants and informed consent was
+not applicable. No institutional ethics approval number can be provided:
+Trinity College Dublin guidance does not permit retrospective ethical approval
+of secondary research on already-public data, no determination was sought
+before the analysis began, and none can now be issued. The authors will answer
+any further enquiry the editorial office wishes to make.
+
+\textbf{Data availability, code availability and data deposition}
+
+The derived, de-identified data and the analysis code that produced every
+reported number are deposited together, with the test suite and the hand-built
+audit evidence, at \url{https://doi.org/10.5281/zenodo.21940596}, which
+resolves to the most recent version of the record. The development repository
+is \url{https://github.com/Gustolandia/football-denominator-gradient}. The
+complete original output of the statistical software for all 30 reported
+gradient models is supplied as Appendix A. Identified source snapshots are not
+redistributed, because provider terms and data-protection obligations do not
+permit it; their reconstruction is documented in the archived code.
 
 \end{document}
